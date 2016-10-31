@@ -1,0 +1,68 @@
+###############################################
+##  YaSat -- Yet Another SAT Solver
+##
+##  Jack Q (qiaobo@outlook.com)
+##  (0540017, CS, NCTU)
+###############################################
+
+# VCS IGNORE FILE
+
+# Directory
+/obj
+/test
+
+# File
+*.o
+
+# Bin File
+yasat
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Ignore tags created by etags, ctags, gtags (GNU global) and cscope
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.files
+cscope.out
+cscope.in.out
+cscope.po.out
