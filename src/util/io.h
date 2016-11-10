@@ -1,15 +1,26 @@
 #ifndef IO_HEADER
 #define IO_HEADER
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <ostream>
 
 namespace yasat
 {
 // define reference to std streams for simplicity in usage and maintance
-std::istream &cin = std::cin;
-std::ostream &cout = std::cout;
-std::ostream &cerr = std::cerr;
+using ::std::istream;
+using ::std::ostream;
+
+using ::std::cin;
+using ::std::cout;
+using ::std::cerr;
+
+using ::std::endl;
+// inline ostream& endl(ostream &o){
+//     o << "\n";
+//     o.flush();
+//     return o;
+// }
 }
 
 #endif // !IO_HEADER

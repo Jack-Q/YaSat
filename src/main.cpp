@@ -8,12 +8,9 @@
  * solver program entry point
  **********************************************/
 
-#include <iostream>
-#include <fstream>
 #include <stdexcept>
 
 #include "yasat.h"
-#include "util/exception.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,24 +31,26 @@ int main(int argc, char *argv[])
       solver.printUsage();
       break;
     case yasat::RoutineException::CANCELLATION:
-      std::cout << "USER CANCELLATION" << std::endl;
+      yasat::cout << "USER CANCELLATION" << yasat::endl;
       break;
     }
     return 0;
   }
   catch (const yasat::Exception &ex)
   {
-    std::cerr << "Internal Exception: " << std::endl
-              << ex.what() << std::endl;
+    yasat::cerr << "Internal Exception: " << yasat::endl
+              << ex.what() << yasat::endl;
+    if(ex.showUsage())
+      solver.printUsage();
   }
   catch (const std::exception &ex)
   {
-    std::cerr << "Internal Exception: " << std::endl
-              << ex.what() << std::endl;
+    yasat::cerr << "Internal Exception: " << yasat::endl
+              << ex.what() << yasat::endl;
   }
   catch (...)
   {
-    std::cerr << "Unknow unhandled exception" << std::endl;
+    yasat::cerr << "Unknow unhandled exception" << yasat::endl;
     throw;
   }
   return 1;

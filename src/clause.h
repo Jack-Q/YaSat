@@ -3,14 +3,24 @@
 
 namespace yasat
 {
+class Bool
+{
+  public:
+    Bool();
+    Bool(bool b);
+    Bool();
+
+  private:
+
+}
+
 class Clause
 {
-public:
+  public:
     Clause();
     ~Clause();
 
-private:
-    
+  private:
 };
 
 Clause::Clause()

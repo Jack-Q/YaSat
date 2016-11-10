@@ -26,7 +26,7 @@ FLAGS=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
 
 # List all the .o files you need to build here
 HEADER_R:= util.h
-HEADERS := yasat.h parser.h \
+HEADERS := yasat.h parser.h clause.h\
 		   util/exception.h util/io.h
 OBJS    := main.o $(HEADERS:.h=.o)
 HEADER_R:= $(addprefix $(DIRSRC)/, $(HEADER_R))

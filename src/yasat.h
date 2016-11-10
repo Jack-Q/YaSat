@@ -1,6 +1,8 @@
 #ifndef YASAT_HEADER
 #define YASAT_HEADER
 
+#include "util.h"
+
 namespace yasat
 {
 
@@ -21,7 +23,7 @@ public:
 
 private:
   int state;
-  std::istream *clauseSource;
+  istream *clauseSource;
 };
 
 inline int YaSat::getState() const
