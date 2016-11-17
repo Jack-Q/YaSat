@@ -17,16 +17,23 @@ using ::std::cerr;
 using ::std::endl;
 
 namespace fmt {
+inline ostream &warning(ostream &);
+inline ostream &warningLabel(ostream &);
+inline ostream &error(ostream &);
+inline ostream &errorLabel(ostream &);
+inline ostream &positive(ostream &);
+inline ostream &negative(ostream &);
+inline ostream &reset(ostream &);
 
-inline ostream &warning(ostream &o) { return o << "\e[1;33m[WARNING] \e[m"; }
-
-inline ostream &error(ostream &o) { return o << "\e[1;35m[ERROR] \e[m"; }
-
-inline ostream &positive(ostream &o) { return o << "\e[4;37m"; }
-
-inline ostream &negative(ostream &o) { return o << "\e[4;30m\e[47m"; }
-
-inline ostream &reset(ostream &o) { return o << "\e[m"; }
+ostream &warning(ostream &o) { return o << "\e[1;33m"; }
+ostream &warningLabel(ostream &o) {
+  return o << warning << "[WARNING] " << reset;
+}
+ostream &error(ostream &o) { return o << "\e[1;35m"; }
+ostream &errorLabel(ostream &o) { return o << error << "[ERROR] " << reset; }
+ostream &positive(ostream &o) { return o << "\e[1;37m"; }
+ostream &negative(ostream &o) { return o << "\e[1;30m\e[47m"; }
+ostream &reset(ostream &o) { return o << "\e[m"; }
 }
 }
 

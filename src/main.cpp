@@ -12,21 +12,16 @@
 
 #include "yasat.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   yasat::YaSat solver;
-  try
-  {
+  try {
     solver.parseArgument(argv, argc);
     solver.loadClause();
     solver.solve();
     solver.printResult();
     return 0;
-  }
-  catch (const yasat::RoutineException &ex)
-  {
-    switch (ex.getType())
-    {
+  } catch (const yasat::RoutineException &ex) {
+    switch (ex.getType()) {
     case yasat::RoutineException::USAGE:
       solver.printUsage();
       break;
@@ -35,21 +30,20 @@ int main(int argc, char *argv[])
       break;
     }
     return 0;
-  }
-  catch (const yasat::Exception &ex)
-  {
-    yasat::cerr << "Internal Exception: " << yasat::endl
-              << ex.what() << yasat::endl;
-    if(ex.showUsage())
+  } catch (const yasat::OptionException &ex) {
+    yasat::cerr << yasat::fmt::errorLabel
+                << "Command Option Exception: " << yasat::endl
+                << ex.what() << yasat::endl;
+    solver.printUsage();
+  } catch (const yasat::Exception &ex) {
+    yasat::cerr << yasat::fmt::errorLabel << "Internal Exception: " << yasat::endl
+                << ex.what() << yasat::endl;
+    if (ex.showUsage())
       solver.printUsage();
-  }
-  catch (const std::exception &ex)
-  {
+  } catch (const std::exception &ex) {
     yasat::cerr << "Internal Exception: " << yasat::endl
-              << ex.what() << yasat::endl;
-  }
-  catch (...)
-  {
+                << ex.what() << yasat::endl;
+  } catch (...) {
     yasat::cerr << "Unknow unhandled exception" << yasat::endl;
     throw;
   }

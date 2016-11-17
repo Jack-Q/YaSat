@@ -45,6 +45,7 @@ public:
   }
 
 private:
+  // the value is aligned with the form of Bool class
   int value;
   inline friend ostream &operator<<(ostream& out, Literial lit) {
     return out <<( lit.value & 2 ? fmt::positive : fmt::negative )<<(lit.value >> 2) << fmt::reset;

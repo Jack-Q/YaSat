@@ -69,3 +69,6 @@ cscope.po.out
 
 # ignore gdb
 .gdb_history
+
+#ignore tmp file
+message.log
