@@ -8,11 +8,11 @@
  * import all of the headers within `util` dir
  **********************************************/
 
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef UTIL_HEADER
+#define UTIL_HEADER
 
 #include "util/io.h"
 #include "util/exception.h"
 #include "util/misc.h"
 
-#endif // !UTIL_H
+#endif

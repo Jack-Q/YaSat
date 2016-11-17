@@ -12,6 +12,7 @@
 #define YASAT_HEADER
 
 #include "util.h"
+#include "clause.h"
 
 namespace yasat
 {
@@ -34,6 +35,7 @@ public:
 private:
   // State
   int state;
+  vector<Clause> clauses;
 
   // IO destination
   istream *inputDataSource;

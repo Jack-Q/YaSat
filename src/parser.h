@@ -1,16 +1,69 @@
+#ifndef PARSER_HEADER
+#define PARSER_HEADER
+
+#include "clause.h"
+#include "util.h"
+
+namespace yasat {
+class Parser {
+public:
+  Parser() : header_lines(0), header_lits(0), clause_lines(0) {}
+
+  void parse(istream &src, vector<Clause> &cls) {
+    string s;
+    char c;
+    while (true) {
+      src >> std::ws;
+      if (src.eof())
+        break;
+      c = src.peek();
+      switch (c) {
+      case 'c':
+        src.ignore();
+        std::getline(src >> std::ws, s);
+        cout << s << endl;
+        continue;
+      case 'p':
+        src.ignore();
+        src >> s >> header_lines >> header_lits;
+        cout << "Header says: " << s << " file type with " << header_lines
+             << " lines, " << header_lits << " literials" << endl;
+        src.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        continue;
+      default:
+        std::getline(src >> std::ws, s);
+        cls.push_back(Clause(s));
+        clause_lines++;
+      }
+    }
+    if (header_lines != clause_lines) {
+      cout << fmt::warning << "Clause count and file header mismatch! " << endl;
+    }
+  }
+
+  void reset() { header_lits = header_lines = clause_lines = 0; }
+
+private:
+  int header_lines;
+  int header_lits;
+  int clause_lines;
+};
+}
+
+#endif
+
 /*********************************************************************
-			   ================
-			   CNF Parsing code
-				18-760
-			      Fall 2006
-			   ================
+                           ================
+                           CNF Parsing code
+                                18-760
+                              Fall 2006
+                           ================
 **********************************************************************/
 
 #ifndef __PARSER_H__
-#  define __PARSER_H__
+#define __PARSER_H__
 #include <vector>
 using std::vector;
-
 
 // parse_DIMACS_CNF
 //
@@ -35,13 +88,11 @@ using std::vector;
 // expression `clauses[i]'.  The jth literal of `clauses[i]' can be
 // referred to using `clauses[i][j]'.  The expression `clauses.size()'
 // tells you the number of clauses in the benchmark.
-void parse_DIMACS_CNF(vector<vector<int> > &clauses,
-		      int &maxVarIndex,
-		      const char *DIMACS_cnf_file);
-
+void parse_DIMACS_CNF(vector<vector<int>> &clauses, int &maxVarIndex,
+                      const char *DIMACS_cnf_file);
 
 /*********************************************************************
-  
+
 Our CNF parser is adapted from:
 
 MiniSat -- Copyright (c) 2003-2005, Niklas Een, Niklas Sorensson
@@ -66,6 +117,5 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 **********************************************************************/
-
 
 #endif

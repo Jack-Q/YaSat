@@ -1,5 +1,5 @@
 #include "yasat.h"
-
+#include "parser.h"
 namespace yasat {
 
 inline void printTitle(ostream &out);
@@ -96,7 +96,11 @@ void YaSat::printUsage() const {
   printHelp(cout);
 }
 
-void YaSat::loadClause() {}
+void YaSat::loadClause() {
+  Parser parser;
+  parser.parse(*inputDataSource, clauses);
+
+}
 
 void YaSat::solve() {}
 
@@ -116,7 +120,7 @@ inline void printHelp(ostream &out) {
   out << "Usage:                                                  " << endl
       << "  yasat INPUT OUTPUT                                    " << endl
       << "    >> read from data file and write to file            " << endl
-      << "  yasat --stdin --stdout                                  " << endl
+      << "  yasat --stdin --stdout                                " << endl
       << "    >> read from `stdin' and write to `stdout'          " << endl
       << "  yasat --help                                          " << endl
       << "    >> print usage information                          " << endl
