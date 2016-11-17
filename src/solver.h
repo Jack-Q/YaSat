@@ -9,17 +9,13 @@ class Solver {
 public:
   Solver(vector<Clause> &cls) : clauses(cls) {}
 
-  void prep(){
+  void prep();
 
-  }
-
-  void solve(){
-
-  }
+  void solve();
 
   void getSolution(vector<Literial>& sol){
     sol.clear();
-    for(int i =0; i < 10; i++)
+    for(int i =1; i < 10; i++)
     sol.push_back(Literial(i));
   }
 

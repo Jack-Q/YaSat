@@ -44,6 +44,10 @@ public:
       value = Bool::BOOL_TRUE | (num << 2);
   }
 
+  inline int getInt() const{
+    return (value & 2 >> 1) * (value >> 2);
+  }
+
 private:
   // the value is aligned with the form of Bool class
   int value;

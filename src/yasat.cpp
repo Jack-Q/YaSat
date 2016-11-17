@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "solver.h"
+#include "writer.h"
 #include "yasat.h"
 
 namespace yasat {
@@ -119,7 +120,9 @@ void YaSat::solve() {
 }
 
 void YaSat::printResult() {
-  
+  Writer writer;
+  message() << fmt::messageLabel << "Write result to output" << endl;
+  writer.write(result(), solution);
 }
 
 // private small functions

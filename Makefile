@@ -27,7 +27,7 @@ FLAGS=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
 
 # List all the .o files you need to build here
 HEADER_R:= util.h
-HEADERS := yasat.h parser.h clause.h\
+HEADERS := yasat.h parser.h clause.h solver.h writer.h\
 		   util/exception.h util/io.h
 OBJS    := main.o $(HEADERS:.h=.o)
 HEADER_R:= $(addprefix $(DIRSRC)/, $(HEADER_R))
@@ -49,17 +49,21 @@ $(DIROBJ)/%.o: $(DIRSRC)/%.cpp $(HEADERS) | dirs
 
 ##################### PHONY ####################
 tags:
-	gtags
+	@gtags
 clean:
 	@rm -rf $(addprefix $(DIROBJ)/, $(OBJS))
 	@rm -rf $(DIRBIN)/$(EXENAME)
 	@rm -rf $(DIROBJ)
 	@rm -rf GPATH  GRTAGS  GSYMS  GTAGS
 	@rm -rf $(DIRTEST)
-test:
+test: all
 	@echo "#### Test ####"
 	@mkdir -p $(DIRTEST)
-	$(DIRBIN)/$(EXENAME) benchmarks/SAT/sanity/sanity3.cnf $(DIRTEST)/sanity3.sat
+	@echo ">>>> Sanity case 3:"
+	#$(DIRBIN)/$(EXENAME) benchmarks/SAT/sanity/sanity3.cnf $(DIRTEST)/sanity3.sat
+	# @cat $(DIRTEST)/sanity3.sat
+	@echo ">>>> Tiny case 1:"
 	$(DIRBIN)/$(EXENAME) benchmarks/SAT/tiny/rand10_20.cnf $(DIRTEST)/tiny1.sat
+	@cat $(DIRTEST)/tiny1.sat
 dirs:
 	@mkdir -p $(DIROBJ)/{,util}

@@ -39,7 +39,7 @@ ostream &messageLabel(ostream &o) {
 }
 ostream &positive(ostream &o) { return o << "\e[1;37m"; }
 ostream &negative(ostream &o) { return o << "\e[1;30m\e[47m"; }
-ostream &reset(ostream &o) { return o << "\e[m"; }
+ostream &reset(ostream &o) { return o << "\e[0m"; }
 }
 }
 
