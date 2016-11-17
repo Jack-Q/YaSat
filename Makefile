@@ -13,6 +13,7 @@ CXX=g++
 DIRSRC=src
 DIRBIN=.
 DIROBJ=obj
+DIRTEST=test
 SHELL=/bin/bash
 
 EXENAME=yasat
@@ -43,18 +44,22 @@ $(DIRBIN)/$(EXENAME): $(addprefix $(DIROBJ)/, $(OBJS))
 	$(CXX) $(FLAGS) -o $@ $^
 
 $(DIROBJ)/%.o: $(DIRSRC)/%.cpp $(HEADERS) | dirs
-	$(CXX) $(FLAGS) -c -o $@ $< 
+	$(CXX) $(FLAGS) -c -o $@ $<
 
 
 ##################### PHONY ####################
 tags:
 	gtags
 clean:
-	@rm -rf $(addprefix $(DIROBJ)/, $(OBJS)) 
+	@rm -rf $(addprefix $(DIROBJ)/, $(OBJS))
 	@rm -rf $(DIRBIN)/$(EXENAME)
 	@rm -rf $(DIROBJ)
 	@rm -rf GPATH  GRTAGS  GSYMS  GTAGS
+	@rm -rf $(DIRTEST)
 test:
 	@echo "#### Test ####"
+	@mkdir -p $(DIRTEST)
+	$(DIRBIN)/$(EXENAME) benchmarks/SAT/sanity/sanity3.cnf $(DIRTEST)/sanity3.sat
+	$(DIRBIN)/$(EXENAME) benchmarks/SAT/tiny/rand10_20.cnf $(DIRTEST)/tiny1.sat
 dirs:
 	@mkdir -p $(DIROBJ)/{,util}
