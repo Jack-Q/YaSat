@@ -1,9 +1,12 @@
-#include "yasat.h"
 #include "parser.h"
+#include "solver.h"
+#include "yasat.h"
+
 namespace yasat {
 
 inline void printTitle(ostream &out);
 inline void printHelp(ostream &out);
+inline void printClauses(ostream &out, vector<Clause> &clauses);
 
 YaSat::YaSat()
     : state(0), inputDataSource(nullptr), outputResult(nullptr),
@@ -99,12 +102,25 @@ void YaSat::printUsage() const {
 void YaSat::loadClause() {
   Parser parser;
   parser.parse(*inputDataSource, clauses);
+  message() << fmt::messageLabel << "Clauses after load:" << endl;
+  printClauses(message(), clauses);
 
 }
 
-void YaSat::solve() {}
+void YaSat::solve() {
+  Solver solver(clauses);
+  solver.prep();
+  message() << fmt::messageLabel << "Clauses after preparation step:" << endl;
+  printClauses(message(), clauses);
+  solver.solve();
+  message() << fmt::messageLabel << "Clauses after soling step:" << endl;
+  printClauses(message(), clauses);
+  solver.getSolution(solution);
+}
 
-void YaSat::printResult() {}
+void YaSat::printResult() {
+  
+}
 
 // private small functions
 
@@ -125,5 +141,10 @@ inline void printHelp(ostream &out) {
       << "  yasat --help                                          " << endl
       << "    >> print usage information                          " << endl
       << endl;
+}
+
+inline void printClauses(ostream &out, vector<Clause> &clauses) {
+  for (auto cls = clauses.begin(); cls != clauses.end(); cls++)
+    out << *cls << endl;
 }
 }

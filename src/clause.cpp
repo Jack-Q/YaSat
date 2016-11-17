@@ -23,9 +23,6 @@ Clause::Clause(string s) : Clause() {
     cout << fmt::warningLabel << "Empty clause line" << endl;
   if (!str.eof())
     cout << fmt::warningLabel << "Literials after 0 in a CNF line is ignored" << endl;
-  for(auto i = lits.begin(); i < lits.end(); i++){
-    cout << *i << " ";
-  }
-  cout << endl;
+  
 }
 }

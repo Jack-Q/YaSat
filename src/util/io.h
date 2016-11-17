@@ -21,6 +21,8 @@ inline ostream &warning(ostream &);
 inline ostream &warningLabel(ostream &);
 inline ostream &error(ostream &);
 inline ostream &errorLabel(ostream &);
+inline ostream &message(ostream &);
+inline ostream &messageLabel(ostream &);
 inline ostream &positive(ostream &);
 inline ostream &negative(ostream &);
 inline ostream &reset(ostream &);
@@ -31,6 +33,10 @@ ostream &warningLabel(ostream &o) {
 }
 ostream &error(ostream &o) { return o << "\e[1;35m"; }
 ostream &errorLabel(ostream &o) { return o << error << "[ERROR] " << reset; }
+ostream &message(ostream &o) { return o << "\e[1;32m"; }
+ostream &messageLabel(ostream &o) {
+  return o << message << "[MESSAGE] " << reset;
+}
 ostream &positive(ostream &o) { return o << "\e[1;37m"; }
 ostream &negative(ostream &o) { return o << "\e[1;30m\e[47m"; }
 ostream &reset(ostream &o) { return o << "\e[m"; }

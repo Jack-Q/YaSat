@@ -26,7 +26,8 @@ int main(int argc, char *argv[]) {
       solver.printUsage();
       break;
     case yasat::RoutineException::CANCELLATION:
-      yasat::cout << "USER CANCELLATION" << yasat::endl;
+      yasat::cout << yasat::fmt::messageLabel << "USER CANCELLATION"
+                  << yasat::endl;
       break;
     }
     return 0;
@@ -36,15 +37,18 @@ int main(int argc, char *argv[]) {
                 << ex.what() << yasat::endl;
     solver.printUsage();
   } catch (const yasat::Exception &ex) {
-    yasat::cerr << yasat::fmt::errorLabel << "Internal Exception: " << yasat::endl
+    yasat::cerr << yasat::fmt::errorLabel
+                << "Internal Exception: " << yasat::endl
                 << ex.what() << yasat::endl;
     if (ex.showUsage())
       solver.printUsage();
   } catch (const std::exception &ex) {
-    yasat::cerr << "Internal Exception: " << yasat::endl
+    yasat::cerr << yasat::fmt::errorLabel
+                << "Internal Exception: " << yasat::endl
                 << ex.what() << yasat::endl;
   } catch (...) {
-    yasat::cerr << "Unknow unhandled exception" << yasat::endl;
+    yasat::cerr << yasat::fmt::errorLabel << "Unknow unhandled exception"
+                << yasat::endl;
     throw;
   }
   return 1;

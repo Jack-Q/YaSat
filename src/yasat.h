@@ -36,6 +36,7 @@ private:
   // State
   int state;
   vector<Clause> clauses;
+  vector<Literial> solution;
 
   // IO destination
   istream *inputDataSource;

@@ -18,7 +18,7 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
     case 'p':
       src.ignore();
       src >> s >> header_lits >> header_lines;
-      cout << "Header says: " << s << " file type with " << header_lines
+      cout << fmt::messageLabel<< "Header says: " << s << " file type with " << header_lines
            << " clauses, " << header_lits << " literials" << endl;
       src.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
