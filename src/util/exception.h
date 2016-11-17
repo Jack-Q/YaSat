@@ -50,5 +50,11 @@ public:
 private:
   Type type;
 };
+
+class OptionException: public Exception {
+public:
+  explicit OptionException(const std::string &msg): Exception(msg, 1, true) {}
+  explicit OptionException(const char *msg): Exception(msg, 1, true) {}
+};
 }
 #endif // !EXCEPTION_HEADER
