@@ -1,3 +1,13 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * yssat.h
+ * main class manage the solver states
+ **********************************************/
+
 #ifndef YASAT_HEADER
 #define YASAT_HEADER
 
@@ -30,5 +40,6 @@ inline int YaSat::getState() const
 {
   return state;
 }
+
 }
 #endif // !YASAT_HEADER

@@ -18,33 +18,24 @@ be converted to such form.
 Since most of the decision or design can be divided into a limited number
 of boolean decision, under certain constraints, a well implemented SAT solver
 can tackle a larger set of practical problem. Currently, SAT solver is the
-core component of EDA as well as lots of other applicaions.
+core component of EDA as well as lots of other applications.
 
 This Implementation
 -------------------
 
-Currently, this implementation is merely a naive one with limited capablilty to
+Currently, this implementation is merely a naive one with limited capability to
 solve problems with less than 20 variables and 50 clauses.
 
-Roadmap
+Road map
 -------
 
-The procedure of this implementation is comfronting the following stages:
-
+The procedure of this implementation is conforming the following stages:
 1. Naive implementation constructing solver framework
-
 1. Novice implementation with heuristic branching (simple)
-
-1. Boolean contraints propogation feature
-
-1. 2-literial watching
-
+1. Boolean constraints propagation feature
+1. 2-literal watching
 1. Conflict driven clause learning
-
 1. Non-chronological backtracking
-
 1. Effective preprocessing
-
 1. Random restart
-
 1. Parallel

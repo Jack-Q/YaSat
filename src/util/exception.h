@@ -9,8 +9,8 @@ namespace yasat
 class Exception : public std::exception
 {
 public:
-  explicit Exception(const char *msg, int lv = 1, isShowUsage = false) : level(lv), message(msg) {}
-  explicit Exception(const std::string &msg, int lv = 1, isShowUsage = false) : level(lv), message(msg) {}
+  explicit Exception(const char *msg, int lv = 1, bool showUsage = false) : level(lv), isShowUsage(showUsage), message(msg){}
+  explicit Exception(const std::string &msg, int lv = 1, bool showUsage = false) : level(lv), isShowUsage(showUsage), message(msg) {}
 
   virtual const char *what() const throw()
   {
