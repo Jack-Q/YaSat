@@ -5,6 +5,8 @@
 #include "util.h"
 
 namespace yasat {
+
+class ClauseWatching;
 class LiterialMeta {
 public:
   LiterialMeta() : weight(0), weightPositive(0), weightNegative(0) {}
@@ -17,8 +19,8 @@ public:
   int weightPositive;
   int weightNegative;
 
-  vector<Clause *> positiveList;
-  vector<Clause *> negativeList;
+  vector<ClauseWatching *> positiveList;
+  vector<ClauseWatching *> negativeList;
   static inline bool weightPtrComparator(LiterialMeta *lit1,
                                          LiterialMeta *lit2) {
     return lit1->weight < lit2->weight;
@@ -41,6 +43,16 @@ public:
   }
 
 private:
+  friend ostream &operator<<(ostream &o, ClauseWatching &w) {
+    for (int j = 0; j < w.clause.getLiterialCount(); j++) {
+      if (j == w.firstWatching || j == w.secondWatching) {
+        o << " [" << w.clause[j] << "] ";
+      } else {
+        o << "  " << w.clause[j] << "  ";
+      }
+    }
+    return o;
+  }
 };
 
 // Assignment of literial, including decisoin and implcation
@@ -69,6 +81,7 @@ public:
       : msg(message), maxLiterial(maxLit), clauses(cls),
         literialMetaList(maxLit),
         unassignedLiterialQueue(LiterialMeta::weightPtrComparator) {
+    clauseWatchingList.reserve(cls.size() * 2);
     int i = 1;
     for (auto litm = literialMetaList.begin(); litm != literialMetaList.end();
          litm++) {
@@ -97,9 +110,9 @@ private:
             .clause[isFirst ? watching.firstWatching : watching.secondWatching];
     LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
     if (lit.isPositive())
-      litM.positiveList.push_back(&watching.clause);
+      litM.positiveList.push_back(&watching);
     else
-      litM.negativeList.push_back(&watching.clause);
+      litM.negativeList.push_back(&watching);
   }
   void removeClauseFromLiterialList(ClauseWatching &watching, int isFirst) {
     Literial &lit =
@@ -108,13 +121,11 @@ private:
     LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
     if (lit.isPositive())
       litM.positiveList.erase(std::remove(litM.positiveList.begin(),
-                                          litM.positiveList.end(),
-                                          &watching.clause),
+                                          litM.positiveList.end(), &watching),
                               litM.positiveList.end());
     else
       litM.negativeList.erase(std::remove(litM.negativeList.begin(),
-                                          litM.negativeList.end(),
-                                          &watching.clause),
+                                          litM.negativeList.end(), &watching),
                               litM.negativeList.end());
   }
 
@@ -158,9 +169,11 @@ private:
   // return -1 if all other literials are assigned
   inline int findNextWatchingLiterial(ClauseWatching &watching) const {
     int i = max(watching.firstWatching, watching.secondWatching);
-    for (int j = i + 1; j != i;
-         j = (j + 1) % watching.clause.getLiterialCount()) {
-      if (j == watching.firstWatching || watching.secondWatching)
+    int c = watching.clause.getLiterialCount();
+    msg << fmt::messageLabel << "Find next watching item in " << watching
+        << endl;
+    for (int j = (i + 1) % c; j != i; j = (j + 1) % c) {
+      if ((j == watching.firstWatching) || (j == watching.secondWatching))
         continue;
       if (!clauseLiterialStatus(watching.clause, j).isAssigned())
         return j;
@@ -170,6 +183,8 @@ private:
 
   void printLiterialMetaList();
   void printClauseWatchingList();
+
+  void updateWatchingLiterial(LiterialMeta &litM, Bool assignValue);
 };
 }
 

@@ -32,57 +32,74 @@ void Solver::prep() {
     }
 
     // Setup two literial watching
-    ClauseWatching watching(*clause);
+    clauseWatchingList.push_back(ClauseWatching(*clause));
+    ClauseWatching &watching = clauseWatchingList.back();
+
     watching.firstWatching = 0;
     addClauseToLiteralList(watching, 1);
-    if(clause->getLiterialCount() > 1){
+    if (clause->getLiterialCount() > 1) {
       watching.secondWatching = 1;
       addClauseToLiteralList(watching, 0);
     }
-    clauseWatchingList.push_back(watching);
 
     // Handle single variable list
-    if(clause->getLiterialCount() == 1){
-      pendingUniqueClauseWatching.push(&clauseWatchingList.back());
+    if (clause->getLiterialCount() == 1) {
+      pendingUniqueClauseWatching.push(&watching);
     }
   }
-
-
 }
 
 void Solver::solve() {
-  // handle initial BCP
-  while(!pendingUniqueClauseWatching.empty()){
-    // Pick unhandled clause
-    ClauseWatching *watching = pendingUniqueClauseWatching.front();
-    pendingUniqueClauseWatching.pop();
+  while (literialAssignmentList.size() < literialMetaList.size()) {
 
-    // place the unique literial at the first position
-    if(watchingLiterialStatus(*watching, 1).isAssigned())
-      watching->swapWatchingIndex();
+    // handle initial BCP
+    while (!pendingUniqueClauseWatching.empty()) {
+      // Pick unhandled clause
+      ClauseWatching *watching = pendingUniqueClauseWatching.front();
+      pendingUniqueClauseWatching.pop();
+      msg << fmt::messageLabel << "handle unique clause " << *watching
+          << endl;
+      // place the unique literial at the first position
+      if (watchingLiterialStatus(*watching, 1).isAssigned())
+        watching->swapWatchingIndex();
 
-    // this unique clause may be assigned during former implcation
-    if(watchingLiterialStatus(*watching, 1).isAssigned())
-      continue;
+      // this unique clause may be assigned during former implcation
+      if (watchingLiterialStatus(*watching, 1).isAssigned())
+        continue;
 
-    Literial &lit = watching->clause[watching->firstWatching];
-    LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
-    LiterialAssignment assignment(litM);
+      Literial &lit = watching->clause[watching->firstWatching];
+      LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+      literialAssignmentList.push_back(LiterialAssignment(litM));
 
-    if(lit.isPositive()){
-      // Perform possible assignment
-      litM.assignmet = Bool::getTrueValue();
-    }else {
-      // Perform negative assignment
-      litM.assignmet = Bool::getFalseValue();
+      if (lit.isPositive()) {
+        // TODO: Mark current as satisfied
+        // Perform possible assignment
+        updateWatchingLiterial(litM, Bool::getTrueValue());
+      } else {
+        // Perform negative assignment
+        updateWatchingLiterial(litM, Bool::getFalseValue());
+      }
     }
 
+    printLiterialMetaList();
+    printClauseWatchingList();
+
+    msg << fmt::messageLabel << "Make decision" << endl;
+    for (auto nxt = literialMetaList.begin(); nxt < literialMetaList.end();
+         nxt++) {
+      if (nxt->assignmet.isAssigned())
+        continue;
+      literialAssignmentList.push_back(LiterialAssignment(
+          *nxt, LiterialAssignment::LITERIAL_ASSIGN_DECISION));
+      if (nxt->weightPositive > nxt->weightNegative) {
+        updateWatchingLiterial(*nxt, Bool::getFalseValue());
+      } else {
+
+        updateWatchingLiterial(*nxt, Bool::getTrueValue());
+      }
+      break;
+    }
   }
-
-  printLiterialMetaList();
-  printClauseWatchingList();
-
-
 }
 
 void Solver::getSolution(vector<Literial> &sol) {
@@ -100,24 +117,62 @@ void Solver::printLiterialMetaList() {
     msg << (i->assignmet.isAssigned()
                 ? i->assignmet.isTrue() ? fmt::message : fmt::negative
                 : fmt::positive)
-        << i->listValue << ":" << i->assignmet << fmt::reset << "("<<i->weight<<")"<< " ";
+        << i->listValue << ":" << i->assignmet << fmt::reset << "(" << i->weight
+        << ")"
+        << " ";
   }
   msg << endl;
 }
 
 void Solver::printClauseWatchingList() {
   msg << fmt::messageLabel << "Clause Watching: " << endl;
-  for (auto i = clauseWatchingList.begin(); i != clauseWatchingList.end();
-       i++) {
-    msg << "      ";
-    for (int j = 0; j < i->clause.getLiterialCount(); j++) {
-      if (j == i->firstWatching || j == i->secondWatching) {
-        msg << " [" << i->clause[j] << "] ";
-      } else {
-        msg << "  " << i->clause[j] << "  ";
+  for (auto i = clauseWatchingList.begin(); i < clauseWatchingList.end(); i++) {
+    msg << "      " << *i << endl;
+  }
+}
+
+
+void Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
+  litM.assignmet = assignValue;
+  auto &clauseUpdateList =
+      assignValue.isTrue() ? litM.negativeList : litM.positiveList;
+  for (auto i = clauseUpdateList.begin(); i < clauseUpdateList.end(); i++) {
+    ClauseWatching *curWat = *i;
+    Literial *curLit = nullptr;
+    if (curWat->firstWatching >= 0) {
+      curLit = &curWat->clause[curWat->firstWatching];
+      if (curLit->getVal() != litM.listValue) {
+        curWat->swapWatchingIndex();
       }
+    } else {
+      curWat->swapWatchingIndex();
     }
-    msg << endl;
+
+    if (!curLit) {
+      curLit = &curWat->clause[curWat->firstWatching];
+    }
+
+    removeClauseFromLiterialList(*curWat, 1);
+    int nextIndex = findNextWatchingLiterial(*curWat);
+    if (nextIndex < 0) {
+      curWat->firstWatching = curWat->secondWatching;
+      curWat->secondWatching = -1;
+      if (curWat->firstWatching < 0) {
+        msg << fmt::messageLabel << fmt::error << "find conflict" << fmt::reset
+            << endl;
+      } else {
+        msg << fmt::messageLabel << "add unique clause" << endl;
+        pendingUniqueClauseWatching.push(curWat);
+      }
+    } else {
+      msg << fmt::messageLabel << "update watching item from "
+          << curWat->firstWatching << " to " << nextIndex << endl;
+      // update watching item
+      curWat->firstWatching = nextIndex;
+      addClauseToLiteralList(*curWat, 1);
+    }
+
+    printClauseWatchingList();
   }
 }
 }
