@@ -52,13 +52,13 @@ void Solver::prep() {
 void Solver::solve() {
   while (literialAssignmentList.size() < literialMetaList.size()) {
 
+    printLiterialMetaList();
     // handle initial BCP
     while (!pendingUniqueClauseWatching.empty()) {
       // Pick unhandled clause
       ClauseWatching *watching = pendingUniqueClauseWatching.front();
       pendingUniqueClauseWatching.pop();
-      msg << fmt::messageLabel << "handle unique clause " << *watching
-          << endl;
+      msg << fmt::messageLabel << "handle unique clause " << *watching << endl;
       // place the unique literial at the first position
       if (watchingLiterialStatus(*watching, 1).isAssigned())
         watching->swapWatchingIndex();
@@ -80,9 +80,6 @@ void Solver::solve() {
         updateWatchingLiterial(litM, Bool::getFalseValue());
       }
     }
-
-    printLiterialMetaList();
-    printClauseWatchingList();
 
     msg << fmt::messageLabel << "Make decision" << endl;
     for (auto nxt = literialMetaList.begin(); nxt < literialMetaList.end();
@@ -131,7 +128,6 @@ void Solver::printClauseWatchingList() {
   }
 }
 
-
 void Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
   litM.assignmet = assignValue;
   auto &clauseUpdateList =
@@ -155,9 +151,9 @@ void Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
     removeClauseFromLiterialList(*curWat, 1);
     int nextIndex = findNextWatchingLiterial(*curWat);
     if (nextIndex < 0) {
-      curWat->firstWatching = curWat->secondWatching;
-      curWat->secondWatching = -1;
-      if (curWat->firstWatching < 0) {
+      // curWat->firstWatching = curWat->secondWatching;
+      // curWat->secondWatching = -1;
+      if (watchingLiterialStatus(*curWat, false)) {
         msg << fmt::messageLabel << fmt::error << "find conflict" << fmt::reset
             << endl;
       } else {
@@ -171,8 +167,6 @@ void Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
       curWat->firstWatching = nextIndex;
       addClauseToLiteralList(*curWat, 1);
     }
-
-    printClauseWatchingList();
   }
 }
 }
