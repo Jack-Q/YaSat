@@ -105,6 +105,17 @@ public:
 
   inline vector<Literial> &getList() { return lits; }
 
+  inline Literial &getLiterial(int at){
+    return lits.at(at);
+  }
+
+  inline int getLiterialCount() const{
+    return lits.size();
+  }
+
+  inline Literial& operator[](int at){
+    return lits.at(at);
+  }
 private:
   vector<Literial> lits;
   inline friend ostream &operator<<(ostream &out, Clause cls) {
