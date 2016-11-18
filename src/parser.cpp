@@ -63,6 +63,7 @@ Clause Parser::parseClause(string &s) {
       break;
   }
 
+
   if (number != 0)
     cout << fmt::warningLabel << "Clause line not terminated with 0" << endl;
   if (lits.empty())

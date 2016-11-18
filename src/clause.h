@@ -12,7 +12,7 @@ public:
   Bool(int i) : Bool() { set(i); }
   // 1 => 3, 3=> 1,0 => 0
   Bool(int i, bool assign) : value(i){
-    if(assign) ;
+    if(!assign) invertValue();
   }
   inline void set(bool b) { value = b ? BOOL_TRUE : BOOL_FALSE; }
   inline void set(int i) {
@@ -23,6 +23,9 @@ public:
     value = i & (~0u << 2);
   }
 
+  inline void invertValue (){
+    value = value & 2 ? BOOL_FALSE : BOOL_TRUE;
+  }
 private:
   // Value of variable
   // internal store form:
@@ -67,6 +70,11 @@ public:
     return Bool(value, false);
   }
 
+  typedef bool(*comparator)(Literial&, Literial&);
+  inline static bool comparatorValue(Literial&a, Literial&b){
+    return a.value < b.value;
+  }
+
 private:
   // the value is aligned with the form of Bool class
   unsigned int value;
@@ -76,6 +84,7 @@ private:
   }
 
 };
+
 
 class Clause {
 public:

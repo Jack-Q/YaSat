@@ -35,7 +35,7 @@ public:
 private:
   // State
   int state;
-  int literialCount;
+  int maxLiterial;
   vector<Clause> clauses;
   vector<Literial> solution;
 
