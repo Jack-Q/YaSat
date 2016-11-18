@@ -13,22 +13,20 @@ void Solver::prep() {
     sort(clause->getList().begin(), clause->getList().end(),
          Literial::comparatorValue);
 
-    // TODO: Handle single variable list
-
-    // TODO: Add positive and negative clauses to list
-    int clauseWeight = 10 - clause->getList().size();
+    // Update the literial weight
+    int clauseWeight = 10 - clause->getLiterialCount();
     if (clauseWeight > 0) {
       for (auto lit = clause->getList().begin(); lit != clause->getList().end();
            lit++) {
         literialMetaList.at(lit->getVal() - 1).weight += clauseWeight;
         if (lit->isPositive()) {
           literialMetaList.at(lit->getVal() - 1).weightPositive += clauseWeight;
-          literialMetaList.at(lit->getVal() - 1)
-              .positiveList.push_back(&*clause);
+          // literialMetaList.at(lit->getVal() - 1)
+          //     .positiveList.push_back(&*clause);
         } else {
           literialMetaList.at(lit->getVal() - 1).weightNegative += clauseWeight;
-          literialMetaList.at(lit->getVal() - 1)
-              .negativeList.push_back(&*clause);
+          // literialMetaList.at(lit->getVal() - 1)
+          //     .negativeList.push_back(&*clause);
         }
       }
     }
@@ -36,16 +34,37 @@ void Solver::prep() {
     // Setup two literial watching
     ClauseWatching watching(*clause);
     watching.firstWatching = 0;
-    watching.secondWatching = 1;
     addClauseToLiteralList(watching, 1);
-    addClauseToLiteralList(watching, 0);
+    if(clause->getLiterialCount() > 1){
+      watching.secondWatching = 1;
+      addClauseToLiteralList(watching, 0);
+    }
     clauseWatchingList.push_back(watching);
+
+    // Handle single variable list
+    if(clause->getLiterialCount() == 1){
+      pendingUniqueClauseWatching.push(&watching);
+    }
   }
+
+
 }
 
 void Solver::solve() {
+  // handle initial BCP
+  while(!pendingUniqueClauseWatching.empty()){
+    // Pick unhandled clause
+    ClauseWatching *watching = pendingUniqueClauseWatching.front();
+    pendingUniqueClauseWatching.pop();
+
+    // TODO: Handle BCP
+
+  }
+
   printLiterialMetaList();
   printClauseWatchingList();
+
+
 }
 
 void Solver::getSolution(vector<Literial> &sol) {
@@ -69,7 +88,6 @@ void Solver::printLiterialMetaList() {
 }
 
 void Solver::printClauseWatchingList() {
-
   msg << fmt::messageLabel << "Clause Watching: " << endl;
   for (auto i = clauseWatchingList.begin(); i != clauseWatchingList.end();
        i++) {

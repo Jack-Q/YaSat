@@ -27,13 +27,30 @@ public:
 
 class ClauseWatching {
 public:
-  ClauseWatching(Clause &c) : clause(c) {}
+  ClauseWatching(Clause &c)
+      : firstWatching(-1), secondWatching(-1), clause(c) {}
 
   int firstWatching;
   int secondWatching;
   Clause &clause;
 
 private:
+};
+
+// Assignment of literial, including decisoin and implcation
+class LiterialAssignment {
+public:
+  static const int LITERIAL_ASSIGN_DECISION = 1;
+  static const int LITERIAL_ASSIGN_IMPLICATION = 0;
+  LiterialAssignment(LiterialMeta &litMeta,
+                     int type = LITERIAL_ASSIGN_IMPLICATION)
+      : type(type), litM(litMeta) {}
+
+  inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
+
+private:
+  int type;
+  LiterialMeta &litM;
 };
 
 class Solver {
@@ -81,11 +98,13 @@ private:
     LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
     if (lit.isPositive())
       litM.positiveList.erase(std::remove(litM.positiveList.begin(),
-                                          litM.positiveList.end(), &watching.clause),
+                                          litM.positiveList.end(),
+                                          &watching.clause),
                               litM.positiveList.end());
     else
       litM.negativeList.erase(std::remove(litM.negativeList.begin(),
-                                          litM.negativeList.end(), &watching.clause),
+                                          litM.negativeList.end(),
+                                          &watching.clause),
                               litM.negativeList.end());
   }
 
@@ -95,9 +114,12 @@ private:
                  std::function<decltype(LiterialMeta::weightPtrComparator)>>
       unassignedLiterialQueue;
 
+  queue<ClauseWatching *> pendingUniqueClauseWatching;
   // Stack for assignment history
-  void printLiterialMetaList();
+  vector<LiterialAssignment> literialAssignmentList;
 
+
+  void printLiterialMetaList();
   void printClauseWatchingList();
 };
 }

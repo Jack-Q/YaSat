@@ -129,9 +129,11 @@ void YaSat::printResult() {
 // private small functions
 
 inline void printTitle(ostream &out) {
-  out << "########################################################" << endl
+  out << fmt::message
+      << "########################################################" << endl
       << "##                        YaSat                       ##" << endl
       << "########################################################" << endl
+      << fmt::reset
       << "                              Jack Q (0540017, CS, NCTU)" << endl
       << endl;
 }

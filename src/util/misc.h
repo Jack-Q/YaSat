@@ -15,6 +15,7 @@ namespace yasat{
 using ::std::string;
 using ::std::vector;
 using ::std::sort;
+using ::std::queue;
 using ::std::priority_queue;
 }
 #endif
