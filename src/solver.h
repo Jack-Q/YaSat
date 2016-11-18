@@ -5,16 +5,25 @@
 #include "util.h"
 
 namespace yasat {
-class LiterialMeta{
+class LiterialMeta {
 public:
-  int listValue;
+  LiterialMeta(){}
 
-  // vector<Clause&>
+  int listValue;
+  Bool assignmet;
+
 };
 
 class Solver {
 public:
-  Solver(vector<Clause> &cls, ostream &message) : msg(message), clauses(cls) {}
+  Solver(vector<Clause> &cls, int maxLit, ostream &message)
+      : msg(message), maxLiterial(maxLit), clauses(cls),
+        literialMetaList(maxLit) {
+          int i = 1;
+          for(auto litm = literialMetaList.begin(); litm!=literialMetaList.end(); litm++){
+            litm->listValue = i++;
+          }
+        }
 
   void prep();
 
@@ -22,12 +31,9 @@ public:
 
   void getSolution(vector<Literial> &sol) {
     sol.clear();
-    for (int i = 1; i < 10; i++)
-      sol.push_back(Literial(i));
-  }
-
-  inline void setMaxLiterial(int maxLit){
-    maxLiterial = maxLit;
+    for(auto litm = literialMetaList.begin(); litm!=literialMetaList.end(); litm++){
+      sol.push_back(Literial(litm->listValue, litm->assignmet));
+    }
   }
 
 private:
@@ -40,7 +46,9 @@ private:
   vector<Clause> &clauses;
 
   // Literial list (for global information)
+  vector<LiterialMeta> literialMetaList;
 
+  // Stack for assignment history
 };
 }
 

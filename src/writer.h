@@ -7,11 +7,11 @@
 namespace yasat{
 class Writer{
 public:
-  Writer(){}
+  Writer(ostream &message): msg(message){}
 
   void write(ostream &out, vector<Literial> &literials);
 private:
-
+  ostream &msg;
 };
 }
 

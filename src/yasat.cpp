@@ -109,9 +109,7 @@ void YaSat::loadClause() {
 }
 
 void YaSat::solve() {
-  Solver solver(clauses, message());
-
-  solver.setMaxLiterial(maxLiterial);
+  Solver solver(clauses, maxLiterial, message());
 
   solver.prep();
   message() << fmt::messageLabel << "Clauses after preparation step:" << endl;
@@ -123,7 +121,7 @@ void YaSat::solve() {
 }
 
 void YaSat::printResult() {
-  Writer writer;
+  Writer writer(message());
   message() << fmt::messageLabel << "Write result to output" << endl;
   writer.write(result(), solution);
 }

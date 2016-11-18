@@ -47,27 +47,41 @@ public:
 class Literial {
   // Use 3 bit for last state
 public:
-  const static unsigned LITERIAL_POSITIVE = 1 << 3;
-  const static unsigned LITERIAL_NEGATIVE = 0 << 3;
-  const static unsigned LITERIAL_FORM_MASK = (~0u << 3 ) | 3;
+  const static unsigned LITERIAL_POSITIVE = 1 << 2;
+  const static unsigned LITERIAL_NEGATIVE = 0 << 2;
+  const static unsigned LITERIAL_FORM_MASK = ~4u;
+  const static unsigned ASSIGNMENT_MASK = ~3u;
   Literial() : value(0) {}
   Literial(int num) : Literial() {
     if (num < 0)
-      value = Bool::BOOL_FALSE | (-num << 2);
+      value = Bool::BOOL_UNASSIGN | LITERIAL_NEGATIVE | (-num << 3);
     else if (num > 0)
-      value = Bool::BOOL_TRUE | (num << 2);
+      value = Bool::BOOL_UNASSIGN | LITERIAL_POSITIVE | (num << 3);
+  }
+  Literial(int num, Bool assign) : Literial(num){
+    value &= ASSIGNMENT_MASK;
+    value |= assign.value;
   }
 
+
+  // Get integer representation form
   inline int getInt() const{
-    return (value & 2u >> 1) * (value >> 2);
+    return isPositive() ? getVal() : -getVal();
   }
 
+  // Get the literial
   inline int getVal() const {
-    return value >> 2;
+    return value >> 3;
   }
 
+  // whether the literial is positive (1) or negative (0)
+  inline int isPositive() const{
+    return (value & 4u) >> 2;
+  }
+
+  // get bool
   inline Bool getBool() const {
-    return Bool(value, false);
+    return Bool(value, isPositive());
   }
 
   typedef bool(*comparator)(Literial&, Literial&);
@@ -79,8 +93,8 @@ private:
   // the value is aligned with the form of Bool class
   unsigned int value;
   inline friend ostream &operator<<(ostream &out, Literial lit) {
-    return out << (lit.value & 2u ? fmt::positive : fmt::negative)
-               << (lit.value >> 2) << fmt::reset;
+    return out << (lit.isPositive() ? fmt::positive : fmt::negative)
+               << lit.getVal() << fmt::reset;
   }
 
 };
