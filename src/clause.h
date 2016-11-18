@@ -9,14 +9,14 @@ class Bool {
 public:
   Bool() : value(0u){};
   Bool(bool b) : Bool() { set(b); }
-  Bool(int i) : Bool() { set(i); }
+  Bool(unsigned int i) : Bool() { set(i); }
   // 1 => 3, 3=> 1,0 => 0
   Bool(int i, bool assign) : value(i) {
     if (!assign)
       invertValue();
   }
   inline void set(bool b) { value = b ? BOOL_TRUE : BOOL_FALSE; }
-  inline void set(int i) {
+  inline void set(unsigned int i) {
     value = (value & (~0u << 2)) |
             (i & 1 ? (i & 2 ? BOOL_TRUE : BOOL_FALSE) : BOOL_UNASSIGN);
   }
@@ -39,6 +39,18 @@ public:
   const static unsigned int BOOL_UNASSIGN = 0;
   const static unsigned int BOOL_TRUE = 3;
   const static unsigned int BOOL_FALSE = 1;
+  inline static Bool getUnsignedValue(){
+    const static Bool BOOL_UNASSIGNED_VALUE(BOOL_UNASSIGN);
+    return BOOL_UNASSIGNED_VALUE;
+  }
+  inline static Bool getTrueValue(){
+    const static Bool BOOL_TRUE_VALUE(BOOL_TRUE);
+    return BOOL_TRUE_VALUE;
+  }
+  inline static Bool getFalseValue(){
+    const static Bool BOOL_FALSE_VALUE(BOOL_FALSE);
+    return BOOL_FALSE_VALUE;
+  }
 
 private:
   unsigned int value;

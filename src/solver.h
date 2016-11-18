@@ -119,9 +119,40 @@ private:
   vector<LiterialAssignment> literialAssignmentList;
 
   // utility functinos
-  inline bool isWatchingLiterialSat(ClauseWatching &watching){
-
+  inline Bool clauseLiterialStatus(Clause &clause, int index) const{
+    Literial &lit = clause[index];
+    const LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+    if (litM.assignmet.isAssigned()) {
+      return litM.assignmet.isTrue() ^ lit.isPositive()
+                 ? Bool::getFalseValue()
+                 : Bool::getTrueValue();
+    } else {
+      // Not assigned status
+      return Bool::getUnsignedValue();
+    }
   }
+  inline Bool watchingLiterialStatus(ClauseWatching &watching, bool isFirst) {
+    int watchingIndex =
+        isFirst ? watching.firstWatching : watching.secondWatching;
+    if (watchingIndex == -1) {
+      // Even though there is no watched variable, this one is satisfied, anyway
+      return true;
+    }
+    return clauseLiterialStatus(watching.clause, watchingIndex);
+  }
+
+  // Find next literial that can be watched
+  // this will skip the status of current watched literials
+  // return -1 if all other literials are assigned
+  inline int findNextWatchingLiterial(ClauseWatching &watching) const {
+    int i = max(watching.firstWatching, watching.secondWatching);
+    for(int j = i + 1; j != i; j = (j + 1) % watching.clause.getLiterialCount()){
+      if(j == watching.firstWatching || watching.secondWatching) continue;
+      if(!clauseLiterialStatus(watching.clause, j).isAssigned()) return j;
+    }
+    return -1;
+  }
+
 
   void printLiterialMetaList();
   void printClauseWatchingList();

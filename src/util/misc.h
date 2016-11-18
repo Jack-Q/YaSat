@@ -1,21 +1,23 @@
 #ifndef MISC_HEADER
 #define MISC_HEADER
 
-#include <string>
-#include <cstring>
-#include <cctype>
-#include <vector>
-#include <limits>
-#include <sstream>
-#include <queue>
 #include <algorithm>
+#include <cctype>
+#include <cstring>
 #include <functional>
+#include <limits>
+#include <queue>
+#include <sstream>
+#include <string>
+#include <vector>
 
-namespace yasat{
+namespace yasat {
 using ::std::string;
 using ::std::vector;
 using ::std::sort;
 using ::std::queue;
 using ::std::priority_queue;
+
+inline int max(int a, int b) { return a > b ? a : b; }
 }
 #endif
