@@ -34,6 +34,12 @@ public:
   int secondWatching;
   Clause &clause;
 
+  inline void swapWatchingIndex() {
+    int tmp = firstWatching;
+    firstWatching = secondWatching;
+    secondWatching = tmp;
+  }
+
 private:
 };
 
@@ -44,12 +50,16 @@ public:
   static const int LITERIAL_ASSIGN_IMPLICATION = 0;
   LiterialAssignment(LiterialMeta &litMeta,
                      int type = LITERIAL_ASSIGN_IMPLICATION)
-      : type(type), litM(litMeta) {}
+      : type(type), firstAssign(true), litM(litMeta) {}
 
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
+  inline bool isFirstAssign() const { return firstAssign; }
+  void nextAssign() { firstAssign = false; }
 
 private:
   int type;
+  // Each decision assignment ought to have two possible decisions to try
+  bool firstAssign;
   LiterialMeta &litM;
 };
 
@@ -114,23 +124,25 @@ private:
                  std::function<decltype(LiterialMeta::weightPtrComparator)>>
       unassignedLiterialQueue;
 
+  // Queue for unique list item
   queue<ClauseWatching *> pendingUniqueClauseWatching;
+
   // Stack for assignment history
   vector<LiterialAssignment> literialAssignmentList;
 
   // utility functinos
-  inline Bool clauseLiterialStatus(Clause &clause, int index) const{
+  inline Bool clauseLiterialStatus(Clause &clause, int index) const {
     Literial &lit = clause[index];
     const LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
     if (litM.assignmet.isAssigned()) {
-      return litM.assignmet.isTrue() ^ lit.isPositive()
-                 ? Bool::getFalseValue()
-                 : Bool::getTrueValue();
+      return litM.assignmet.isTrue() ^ lit.isPositive() ? Bool::getFalseValue()
+                                                        : Bool::getTrueValue();
     } else {
       // Not assigned status
       return Bool::getUnsignedValue();
     }
   }
+
   inline Bool watchingLiterialStatus(ClauseWatching &watching, bool isFirst) {
     int watchingIndex =
         isFirst ? watching.firstWatching : watching.secondWatching;
@@ -146,13 +158,15 @@ private:
   // return -1 if all other literials are assigned
   inline int findNextWatchingLiterial(ClauseWatching &watching) const {
     int i = max(watching.firstWatching, watching.secondWatching);
-    for(int j = i + 1; j != i; j = (j + 1) % watching.clause.getLiterialCount()){
-      if(j == watching.firstWatching || watching.secondWatching) continue;
-      if(!clauseLiterialStatus(watching.clause, j).isAssigned()) return j;
+    for (int j = i + 1; j != i;
+         j = (j + 1) % watching.clause.getLiterialCount()) {
+      if (j == watching.firstWatching || watching.secondWatching)
+        continue;
+      if (!clauseLiterialStatus(watching.clause, j).isAssigned())
+        return j;
     }
     return -1;
   }
-
 
   void printLiterialMetaList();
   void printClauseWatchingList();

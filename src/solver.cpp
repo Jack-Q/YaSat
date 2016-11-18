@@ -43,7 +43,7 @@ void Solver::prep() {
 
     // Handle single variable list
     if(clause->getLiterialCount() == 1){
-      pendingUniqueClauseWatching.push(&watching);
+      pendingUniqueClauseWatching.push(&clauseWatchingList.back());
     }
   }
 
@@ -57,7 +57,25 @@ void Solver::solve() {
     ClauseWatching *watching = pendingUniqueClauseWatching.front();
     pendingUniqueClauseWatching.pop();
 
-    // TODO: Handle BCP
+    // place the unique literial at the first position
+    if(watchingLiterialStatus(*watching, 1).isAssigned())
+      watching->swapWatchingIndex();
+
+    // this unique clause may be assigned during former implcation
+    if(watchingLiterialStatus(*watching, 1).isAssigned())
+      continue;
+
+    Literial &lit = watching->clause[watching->firstWatching];
+    LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+    LiterialAssignment assignment(litM);
+
+    if(lit.isPositive()){
+      // Perform possible assignment
+      litM.assignmet = Bool::getTrueValue();
+    }else {
+      // Perform negative assignment
+      litM.assignmet = Bool::getFalseValue();
+    }
 
   }
 

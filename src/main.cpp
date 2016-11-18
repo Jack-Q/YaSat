@@ -42,14 +42,14 @@ int main(int argc, char *argv[]) {
                 << ex.what() << yasat::endl;
     if (ex.showUsage())
       solver.printUsage();
-  } catch (const std::exception &ex) {
-    yasat::cerr << yasat::fmt::errorLabel
-                << "Internal Exception: " << yasat::endl
-                << ex.what() << yasat::endl;
-  } catch (...) {
-    yasat::cerr << yasat::fmt::errorLabel << "Unknow unhandled exception"
-                << yasat::endl;
-    throw;
+  // } catch (const std::exception &ex) {
+  //   yasat::cerr << yasat::fmt::errorLabel
+  //               << "Internal Exception: " << yasat::endl
+  //               << ex.what() << yasat::endl;
+  // } catch (...) {
+  //   yasat::cerr << yasat::fmt::errorLabel << "Unknow unhandled exception"
+  //               << yasat::endl;
+  //   throw;
   }
   return 1;
 }
