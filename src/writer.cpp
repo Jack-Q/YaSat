@@ -15,7 +15,6 @@ void Writer::write(ostream &out, vector<Literial> &solution) {
     out << i->getInt() << " ";
   out << "0" << endl;
 
-
   msg << fmt::messageLabel << "Result: " << fmt::message << "SATISFIABLE"
       << fmt::reset << endl;
   msg << fmt::messageLabel << "Assignment: ";

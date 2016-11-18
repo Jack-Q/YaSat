@@ -7,11 +7,13 @@
 namespace yasat {
 class LiterialMeta {
 public:
-  LiterialMeta(){}
+  LiterialMeta() {}
 
   int listValue;
   Bool assignmet;
 
+  vector<Clause &> positiveList;
+  vector<Clause &> negativeList;
 };
 
 class Solver {
@@ -19,22 +21,18 @@ public:
   Solver(vector<Clause> &cls, int maxLit, ostream &message)
       : msg(message), maxLiterial(maxLit), clauses(cls),
         literialMetaList(maxLit) {
-          int i = 1;
-          for(auto litm = literialMetaList.begin(); litm!=literialMetaList.end(); litm++){
-            litm->listValue = i++;
-          }
-        }
+    int i = 1;
+    for (auto litm = literialMetaList.begin(); litm != literialMetaList.end();
+         litm++) {
+      litm->listValue = i++;
+    }
+  }
 
   void prep();
 
   void solve();
 
-  void getSolution(vector<Literial> &sol) {
-    sol.clear();
-    for(auto litm = literialMetaList.begin(); litm!=literialMetaList.end(); litm++){
-      sol.push_back(Literial(litm->listValue, litm->assignmet));
-    }
-  }
+  void getSolution(vector<Literial> &sol);
 
 private:
   // informative
@@ -49,6 +47,8 @@ private:
   vector<LiterialMeta> literialMetaList;
 
   // Stack for assignment history
+
+  void printLiterialMetaList();
 };
 }
 

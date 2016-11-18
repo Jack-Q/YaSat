@@ -11,22 +11,26 @@ public:
   Bool(bool b) : Bool() { set(b); }
   Bool(int i) : Bool() { set(i); }
   // 1 => 3, 3=> 1,0 => 0
-  Bool(int i, bool assign) : value(i){
-    if(!assign) invertValue();
+  Bool(int i, bool assign) : value(i) {
+    if (!assign)
+      invertValue();
   }
   inline void set(bool b) { value = b ? BOOL_TRUE : BOOL_FALSE; }
   inline void set(int i) {
     value = (value & (~0u << 2)) |
             (i & 1 ? (i & 2 ? BOOL_TRUE : BOOL_FALSE) : BOOL_UNASSIGN);
   }
-  inline void setValue(int i){
-    value = i & (~0u << 2);
-  }
+  inline void setValue(int i) { value = i & (~0u << 2); }
 
-  inline void invertValue (){
-    value = value & 2 ? BOOL_FALSE : BOOL_TRUE;
-  }
-private:
+  inline void invertValue() { value = value & 2 ? BOOL_FALSE : BOOL_TRUE; }
+
+  inline operator bool() const { return (value & 2) != 0; }
+
+  inline unsigned int getValue() const { return (value & 2) >> 1; }
+
+  inline unsigned int isAssigned() const { return value & 1; }
+  inline unsigned int isTrue() const { return (value & 2) >> 1; }
+
   // Value of variable
   // internal store form:
   // 0b00: unassigned value
@@ -35,11 +39,13 @@ private:
   const static unsigned int BOOL_UNASSIGN = 0;
   const static unsigned int BOOL_TRUE = 3;
   const static unsigned int BOOL_FALSE = 1;
+
+private:
   unsigned int value;
 
 public:
   inline friend ostream &operator<<(ostream &out, Bool &b) {
-    return out << (b.value & 1 ? (b.value & 2 ? "TRUE" : "FALSE") : "UNDET");
+    return out << (b.isAssigned() ? (b.isTrue() ? "TRUE" : "FALSE") : "UNDET");
   }
   friend Literial;
 };
@@ -58,34 +64,28 @@ public:
     else if (num > 0)
       value = Bool::BOOL_UNASSIGN | LITERIAL_POSITIVE | (num << 3);
   }
-  Literial(int num, Bool assign) : Literial(num){
+  Literial(int num, Bool assign) : Literial(num) {
     value &= ASSIGNMENT_MASK;
     value |= assign.value;
   }
-
+  Literial(unsigned int num, unsigned int sign, unsigned int assign) {
+    value = num << 3 | (sign & 1) << 2 | assign;
+  }
 
   // Get integer representation form
-  inline int getInt() const{
-    return isPositive() ? getVal() : -getVal();
-  }
+  inline int getInt() const { return isPositive() ? getVal() : -getVal(); }
 
   // Get the literial
-  inline int getVal() const {
-    return value >> 3;
-  }
+  inline int getVal() const { return value >> 3; }
 
   // whether the literial is positive (1) or negative (0)
-  inline int isPositive() const{
-    return (value & 4u) >> 2;
-  }
+  inline int isPositive() const { return (value & 4u) >> 2; }
 
   // get bool
-  inline Bool getBool() const {
-    return Bool(value, isPositive());
-  }
+  inline Bool getBool() const { return Bool(value, isPositive()); }
 
-  typedef bool(*comparator)(Literial&, Literial&);
-  inline static bool comparatorValue(Literial&a, Literial&b){
+  typedef bool (*comparator)(Literial &, Literial &);
+  inline static bool comparatorValue(Literial &a, Literial &b) {
     return a.value < b.value;
   }
 
@@ -96,16 +96,15 @@ private:
     return out << (lit.isPositive() ? fmt::positive : fmt::negative)
                << lit.getVal() << fmt::reset;
   }
-
 };
-
 
 class Clause {
 public:
   Clause() {}
   ~Clause() {}
 
-  inline vector<Literial> &getList(){return lits;}
+  inline vector<Literial> &getList() { return lits; }
+
 private:
   vector<Literial> lits;
   inline friend ostream &operator<<(ostream &out, Clause cls) {
