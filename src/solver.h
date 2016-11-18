@@ -7,21 +7,28 @@
 namespace yasat {
 class Solver {
 public:
-  Solver(vector<Clause> &cls) : clauses(cls) {}
+  Solver(vector<Clause> &cls, ostream &message) : msg(message), clauses(cls) {}
 
   void prep();
 
   void solve();
 
-  void getSolution(vector<Literial>& sol){
+  void getSolution(vector<Literial> &sol) {
     sol.clear();
-    for(int i =1; i < 10; i++)
-    sol.push_back(Literial(i));
+    for (int i = 1; i < 10; i++)
+      sol.push_back(Literial(i));
   }
 
 private:
-  int interialCount;
+  // informative
+  ostream &msg;
+
+  int literialCount;
+
+  // Clause list
   vector<Clause> &clauses;
+
+  // Literial list (for global information)
 };
 }
 

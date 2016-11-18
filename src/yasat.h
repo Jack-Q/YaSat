@@ -35,6 +35,7 @@ public:
 private:
   // State
   int state;
+  int literialCount;
   vector<Clause> clauses;
   vector<Literial> solution;
 

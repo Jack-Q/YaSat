@@ -109,7 +109,7 @@ void YaSat::loadClause() {
 }
 
 void YaSat::solve() {
-  Solver solver(clauses);
+  Solver solver(clauses, message());
   solver.prep();
   message() << fmt::messageLabel << "Clauses after preparation step:" << endl;
   printClauses(message(), clauses);

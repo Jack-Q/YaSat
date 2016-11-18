@@ -7,15 +7,19 @@
 namespace yasat {
 class Parser {
 public:
-  Parser() : header_lines(0), header_lits(0), clause_lines(0) {}
+  Parser() {reset();}
 
   void parse(istream &src, vector<Clause> &cls);
-  void reset() { header_lits = header_lines = clause_lines = 0; }
+  void reset() { header_lits = header_lines = clause_lines = maxLiterial = 0; }
 
+  inline int getMaxLiterial() const {return maxLiterial;}
 private:
   int header_lines;
   int header_lits;
   int clause_lines;
+  int maxLiterial;
+
+  Clause parseClause(string& s);
 };
 }
 
