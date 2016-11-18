@@ -67,7 +67,9 @@ public:
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
   inline bool isFirstAssign() const { return firstAssign; }
   void nextAssign() { firstAssign = false; }
-
+  LiterialMeta& getLiterialMeta(){
+    return litM;
+  }
 private:
   int type;
   // Each decision assignment ought to have two possible decisions to try
@@ -100,6 +102,8 @@ private:
   ostream &msg;
 
   int maxLiterial;
+  bool rollback = false;
+  bool unsatisfiable = false;
 
   // Clause list
   vector<Clause> &clauses;
@@ -184,7 +188,9 @@ private:
   void printLiterialMetaList();
   void printClauseWatchingList();
 
-  void updateWatchingLiterial(LiterialMeta &litM, Bool assignValue);
+  int updateWatchingLiterial(LiterialMeta &litM, Bool assignValue);
+
+  void rollbackAfterConflict();
 };
 }
 
