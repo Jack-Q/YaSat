@@ -61,12 +61,21 @@ void Solver::solve() {
         msg << fmt::messageLabel << "handle unique clause " << *watching
             << endl;
         // place the unique literial at the first position
-        if (watchingLiterialStatus(*watching, 1).isAssigned())
+        Bool result_1 = watchingLiterialStatus(*watching, true);
+        Bool result_2 = watchingLiterialStatus(*watching, false);
+        if (result_1.isAssigned() && result_2.isAssigned()) {
+          if (result_1.isTrue() && result_2.isTrue()){
+            msg << fmt::messageLabel
+                << "current unique clause is resolved already" << endl;
+            continue;
+          }else{
+            msg << fmt::messageLabel << "confilct 1" << endl;
+            rollbackAfterConflict();
+            break;
+          }
+        }
+        if(result_1.isAssigned())
           watching->swapWatchingIndex();
-
-        // this unique clause may be assigned during former implcation
-        if (watchingLiterialStatus(*watching, 1).isAssigned())
-          continue;
 
         Literial &lit = watching->clause[watching->firstWatching];
         LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
@@ -75,15 +84,23 @@ void Solver::solve() {
         if (lit.isPositive()) {
           // TODO: Mark current as satisfied
           // Perform possible assignment
-          if (updateWatchingLiterial(litM, Bool::getTrueValue()))
+          msg << fmt::messageLabel << "Make implication: " << litM.listValue
+              << " -> " << Bool::getTrueValue() << endl;
+          if (updateWatchingLiterial(litM, Bool::getTrueValue()) < 0) {
             rollbackAfterConflict();
+          }
         } else {
           // Perform negative assignment
-          if (updateWatchingLiterial(litM, Bool::getFalseValue()))
+          msg << fmt::messageLabel << "Make implication: " << litM.listValue
+              << " -> " << Bool::getFalseValue() << endl;
+          if (updateWatchingLiterial(litM, Bool::getFalseValue()) < 0) {
             rollbackAfterConflict();
+          }
         }
       }
 
+      if (rollback)
+        continue;
       msg << fmt::messageLabel << "Make decision" << endl;
       bool assign = false;
       for (auto nxt = literialMetaList.begin(); nxt < literialMetaList.end();
@@ -93,23 +110,35 @@ void Solver::solve() {
         literialAssignmentList.push_back(LiterialAssignment(
             *nxt, LiterialAssignment::LITERIAL_ASSIGN_DECISION));
         if (nxt->weightPositive > nxt->weightNegative) {
-          if (updateWatchingLiterial(*nxt, Bool::getFalseValue()) < 0)
+          msg << fmt::messageLabel << "Make decision: " << nxt->listValue
+              << " -> " << Bool::getFalseValue() << endl;
+          if (updateWatchingLiterial(*nxt, Bool::getFalseValue()) < 0) {
             rollbackAfterConflict();
+            break;
+          }
         } else {
-          if (updateWatchingLiterial(*nxt, Bool::getTrueValue()) < 0)
+          msg << fmt::messageLabel << "Make decision: " << nxt->listValue
+              << " -> " << Bool::getTrueValue() << endl;
+          if (updateWatchingLiterial(*nxt, Bool::getTrueValue()) < 0) {
             rollbackAfterConflict();
+            break;
+          }
         }
         assign = true;
         break;
       }
-      if(!assign) return;
+      if (!rollback && !assign)
+        return;
     } else {
       if (unsatisfiable) {
         return;
       }
       rollback = false;
-      msg << fmt::messageLabel << "Rollback, make another decision" << endl;
       LiterialMeta &litM = literialAssignmentList.back().getLiterialMeta();
+
+      msg << fmt::messageLabel
+          << "Rollback, make another decision: " << litM.listValue << " -> "
+          << litM.assignmet << endl;
       if (updateWatchingLiterial(litM, litM.assignmet) < 0)
         rollbackAfterConflict();
     }
@@ -167,21 +196,25 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
       curLit = &curWat->clause[curWat->firstWatching];
     }
 
-    removeClauseFromLiterialList(*curWat, 1);
     int nextIndex = findNextWatchingLiterial(*curWat);
     if (nextIndex < 0) {
       // curWat->firstWatching = curWat->secondWatching;
       // curWat->secondWatching = -1;
-      if (watchingLiterialStatus(*curWat, false)) {
+      Bool result = watchingLiterialStatus(*curWat, false);
+      if (result.isAssigned() && !result.isTrue()) {
         msg << fmt::messageLabel << fmt::error << "find conflict" << fmt::reset
             << endl;
+        msg << fmt::messageLabel << "conflict @ " << *curWat << endl;
+        printLiterialMetaList();
         return -1;
 
-      } else {
+      }
+      if(!result.isAssigned()) {
         msg << fmt::messageLabel << "add unique clause" << endl;
         pendingUniqueClauseWatching.push(curWat);
       }
     } else {
+      removeClauseFromLiterialList(*curWat, 1);
       msg << fmt::messageLabel << "update watching item from "
           << curWat->firstWatching << " to " << nextIndex << endl;
       // update watching item
@@ -194,6 +227,9 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
 
 void Solver::rollbackAfterConflict() {
   rollback = true;
+  // Clear pending unique clause
+  while (!pendingUniqueClauseWatching.empty())
+    pendingUniqueClauseWatching.pop();
   while (!literialAssignmentList.empty()) {
     LiterialAssignment &lastAssignment = literialAssignmentList.back();
     if (lastAssignment.isDecision()) {

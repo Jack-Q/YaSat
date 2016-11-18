@@ -67,9 +67,8 @@ public:
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
   inline bool isFirstAssign() const { return firstAssign; }
   void nextAssign() { firstAssign = false; }
-  LiterialMeta& getLiterialMeta(){
-    return litM;
-  }
+  LiterialMeta &getLiterialMeta() { return litM; }
+
 private:
   int type;
   // Each decision assignment ought to have two possible decisions to try
@@ -150,8 +149,10 @@ private:
     Literial &lit = clause[index];
     const LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
     if (litM.assignmet.isAssigned()) {
-      return litM.assignmet.isTrue() ^ lit.isPositive() ? Bool::getFalseValue()
-                                                        : Bool::getTrueValue();
+      return ((litM.assignmet.isTrue() && lit.isPositive()) ||
+              (!litM.assignmet.isTrue() && !lit.isPositive()))
+                 ? Bool::getTrueValue()
+                 : Bool::getFalseValue();
     } else {
       // Not assigned status
       return Bool::getUnsignedValue();
@@ -163,7 +164,7 @@ private:
         isFirst ? watching.firstWatching : watching.secondWatching;
     if (watchingIndex == -1) {
       // Even though there is no watched variable, this one is satisfied, anyway
-      return true;
+      return Bool::getTrueValue();
     }
     return clauseLiterialStatus(watching.clause, watchingIndex);
   }
