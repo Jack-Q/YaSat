@@ -118,6 +118,10 @@ private:
   // Stack for assignment history
   vector<LiterialAssignment> literialAssignmentList;
 
+  // utility functinos
+  inline bool isWatchingLiterialSat(ClauseWatching &watching){
+
+  }
 
   void printLiterialMetaList();
   void printClauseWatchingList();

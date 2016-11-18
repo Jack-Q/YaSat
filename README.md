@@ -30,6 +30,7 @@ Road map
 -------
 
 The procedure of this implementation is conforming the following stages:
+
 1. Naive implementation constructing solver framework
 1. Novice implementation with heuristic branching (simple)
 1. Boolean constraints propagation feature
