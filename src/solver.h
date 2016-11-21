@@ -107,30 +107,10 @@ private:
   // Clause list
   vector<Clause> &clauses;
   vector<ClauseWatching> clauseWatchingList;
-  void addClauseToLiteralList(ClauseWatching &watching, int isFirst) {
-    Literial &lit =
-        watching
-            .clause[isFirst ? watching.firstWatching : watching.secondWatching];
-    LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
-    if (lit.isPositive())
-      litM.positiveList.push_back(&watching);
-    else
-      litM.negativeList.push_back(&watching);
-  }
-  void removeClauseFromLiterialList(ClauseWatching &watching, int isFirst) {
-    Literial &lit =
-        watching
-            .clause[isFirst ? watching.firstWatching : watching.secondWatching];
-    LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
-    if (lit.isPositive())
-      litM.positiveList.erase(std::remove(litM.positiveList.begin(),
-                                          litM.positiveList.end(), &watching),
-                              litM.positiveList.end());
-    else
-      litM.negativeList.erase(std::remove(litM.negativeList.begin(),
-                                          litM.negativeList.end(), &watching),
-                              litM.negativeList.end());
-  }
+
+  void addClauseToLiteralList(ClauseWatching &watching, int isFirst);
+
+  void removeClauseFromLiterialList(ClauseWatching &watching, int isFirst);
 
   // Literial list (for global information)
   vector<LiterialMeta> literialMetaList;
@@ -145,59 +125,18 @@ private:
   vector<LiterialAssignment> literialAssignmentList;
 
   // utility functinos
-  inline Bool clauseLiterialStatus(Clause &clause, int index) const {
-    Literial &lit = clause[index];
-    const LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
-    if (litM.assignmet.isAssigned()) {
-      return ((litM.assignmet.isTrue() && lit.isPositive()) ||
-              (!litM.assignmet.isTrue() && !lit.isPositive()))
-                 ? Bool::getTrueValue()
-                 : Bool::getFalseValue();
-    } else {
-      // Not assigned status
-      return Bool::getUnsignedValue();
-    }
-  }
+  Bool clauseLiterialStatus(Clause &clause, int index) const;
 
-  inline Bool watchingLiterialStatus(ClauseWatching &watching, bool isFirst) {
-    int watchingIndex =
-        isFirst ? watching.firstWatching : watching.secondWatching;
-    if (watchingIndex == -1) {
-      // Even though there is no watched variable, this one is satisfied, anyway
-      return Bool::getTrueValue();
-    }
-    return clauseLiterialStatus(watching.clause, watchingIndex);
-  }
+  Bool watchingLiterialStatus(ClauseWatching &watching, bool isFirst) const;
 
   // Find next literial that can be watched
   // this will skip the status of current watched literials
   // return -1 if chrrent clause is already satisfied
   // return -2 if all other literials are assigned and failed
-  inline int findNextWatchingLiterial(ClauseWatching &watching) const {
-    int i = max(watching.firstWatching, watching.secondWatching);
-    int c = watching.clause.getLiterialCount();
-    msg << fmt::messageLabel << "Find next watching item in " << watching
-        << endl;
-    for (int j = (i + 1) % c; j != i; j = (j + 1) % c) {
-      if ((j == watching.firstWatching) || (j == watching.secondWatching))
-        continue;
-      Bool litStatus = clauseLiterialStatus(watching.clause, j);
-      if (litStatus.isAssigned()){
-        if(litStatus.isTrue()){
-          // since current clause is already satisfied, no further searching is required
-          return -1;
-        }
-        continue;
-      }else{
-        // find an unsigned literial
-        return j;
-      }
-    }
-    // no result found
-    return -2;
-  }
+  int findNextWatchingLiterial(ClauseWatching &watching) const;
 
   void printLiterialMetaList();
+
   void printClauseWatchingList();
 
   int updateWatchingLiterial(LiterialMeta &litM, Bool assignValue);

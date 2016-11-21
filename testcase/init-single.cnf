@@ -1,8 +1,0 @@
-c This test case contains single variable in some clauses,
-c which means that some BCP operation ought to be done before
-c any decision was make
-p cnf  5 4
--1 -3 -4 0
-5 2 3 0
-1 0
--5 0

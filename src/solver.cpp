@@ -156,9 +156,86 @@ void Solver::getSolution(vector<Literial> &sol) {
   }
 }
 
+
+void Solver::addClauseToLiteralList(ClauseWatching &watching, int isFirst) {
+  Literial &lit =
+      watching
+          .clause[isFirst ? watching.firstWatching : watching.secondWatching];
+  LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+  if (lit.isPositive())
+    litM.positiveList.push_back(&watching);
+  else
+    litM.negativeList.push_back(&watching);
+}
+
+void Solver::removeClauseFromLiterialList(ClauseWatching &watching, int isFirst) {
+  Literial &lit =
+      watching
+          .clause[isFirst ? watching.firstWatching : watching.secondWatching];
+  LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+  if (lit.isPositive())
+    litM.positiveList.erase(std::remove(litM.positiveList.begin(),
+                                        litM.positiveList.end(), &watching),
+                            litM.positiveList.end());
+  else
+    litM.negativeList.erase(std::remove(litM.negativeList.begin(),
+                                        litM.negativeList.end(), &watching),
+                            litM.negativeList.end());
+}
+
+
+Bool Solver::clauseLiterialStatus(Clause &clause, int index) const {
+  Literial &lit = clause[index];
+  const LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+  if (litM.assignmet.isAssigned()) {
+    return ((litM.assignmet.isTrue() && lit.isPositive()) ||
+            (!litM.assignmet.isTrue() && !lit.isPositive()))
+               ? Bool::getTrueValue()
+               : Bool::getFalseValue();
+  } else {
+    // Not assigned status
+    return Bool::getUnsignedValue();
+  }
+}
+
+Bool Solver::watchingLiterialStatus(ClauseWatching &watching, bool isFirst) const{
+  int watchingIndex =
+      isFirst ? watching.firstWatching : watching.secondWatching;
+  if (watchingIndex == -1) {
+    // Even though there is no watched variable, this one is satisfied, anyway
+    return Bool::getTrueValue();
+  }
+  return clauseLiterialStatus(watching.clause, watchingIndex);
+}
+
+int Solver::findNextWatchingLiterial(ClauseWatching &watching) const {
+  int i = max(watching.firstWatching, watching.secondWatching);
+  int c = watching.clause.getLiterialCount();
+  msg << fmt::messageLabel << "Find next watching item in " << watching
+      << endl;
+  for (int j = (i + 1) % c; j != i; j = (j + 1) % c) {
+    if ((j == watching.firstWatching) || (j == watching.secondWatching))
+      continue;
+    Bool litStatus = clauseLiterialStatus(watching.clause, j);
+    if (litStatus.isAssigned()){
+      if(litStatus.isTrue()){
+        // since current clause is already satisfied, no further searching is required
+        return -1;
+      }
+      continue;
+    }else{
+      // find an unsigned literial
+      return j;
+    }
+  }
+  // no result found
+  return -2;
+}
+
 void Solver::printLiterialMetaList() {
   msg << fmt::messageLabel << "LitMeta: ";
-  for (auto i = literialMetaList.begin(); i != literialMetaList.end(); i++) {
+  int limit = 100;
+  for (auto i = literialMetaList.begin(); i != literialMetaList.end() && limit--; i++) {
     msg << (i->assignmet.isAssigned()
                 ? i->assignmet.isTrue() ? fmt::message : fmt::negative
                 : fmt::positive)
@@ -166,6 +243,7 @@ void Solver::printLiterialMetaList() {
         << ")"
         << " ";
   }
+  if(!++limit) msg << " ...";
   msg << endl;
 }
 

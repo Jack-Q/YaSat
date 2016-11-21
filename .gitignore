@@ -72,3 +72,4 @@ cscope.po.out
 
 #ignore tmp file
 message.log
+/testcase
