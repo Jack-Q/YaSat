@@ -64,12 +64,12 @@ void Solver::solve() {
         Bool result_1 = watchingLiterialStatus(*watching, true);
         Bool result_2 = watchingLiterialStatus(*watching, false);
         if (result_1.isAssigned() && result_2.isAssigned()) {
-          if (result_1.isTrue() && result_2.isTrue()){
+          if (result_1.isTrue() || result_2.isTrue()){
             msg << fmt::messageLabel
                 << "current unique clause is resolved already" << endl;
             continue;
           }else{
-            msg << fmt::messageLabel << "confilct 1" << endl;
+            msg << fmt::messageLabel << "confilct" <<endl;
             rollbackAfterConflict();
             break;
           }
@@ -215,7 +215,7 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
         pendingUniqueClauseWatching.push(curWat);
       }
     } else if(nextIndex == -1) {
-      // this clause is satisfied 
+      // this clause is satisfied
     }else{
       removeClauseFromLiterialList(*curWat, 1);
       msg << fmt::messageLabel << "update watching item from "
