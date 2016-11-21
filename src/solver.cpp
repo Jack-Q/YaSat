@@ -197,7 +197,8 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
     }
 
     int nextIndex = findNextWatchingLiterial(*curWat);
-    if (nextIndex < 0) {
+
+    if (nextIndex == -2) {
       // curWat->firstWatching = curWat->secondWatching;
       // curWat->secondWatching = -1;
       Bool result = watchingLiterialStatus(*curWat, false);
@@ -213,7 +214,9 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
         msg << fmt::messageLabel << "add unique clause" << endl;
         pendingUniqueClauseWatching.push(curWat);
       }
-    } else {
+    } else if(nextIndex == -1) {
+      // this clause is satisfied 
+    }else{
       removeClauseFromLiterialList(*curWat, 1);
       msg << fmt::messageLabel << "update watching item from "
           << curWat->firstWatching << " to " << nextIndex << endl;

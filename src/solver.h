@@ -171,7 +171,8 @@ private:
 
   // Find next literial that can be watched
   // this will skip the status of current watched literials
-  // return -1 if all other literials are assigned
+  // return -1 if chrrent clause is already satisfied
+  // return -2 if all other literials are assigned and failed
   inline int findNextWatchingLiterial(ClauseWatching &watching) const {
     int i = max(watching.firstWatching, watching.secondWatching);
     int c = watching.clause.getLiterialCount();
@@ -180,10 +181,20 @@ private:
     for (int j = (i + 1) % c; j != i; j = (j + 1) % c) {
       if ((j == watching.firstWatching) || (j == watching.secondWatching))
         continue;
-      if (!clauseLiterialStatus(watching.clause, j).isAssigned())
+      Bool litStatus = clauseLiterialStatus(watching.clause, j);
+      if (litStatus.isAssigned()){
+        if(litStatus.isTrue()){
+          // since current clause is already satisfied, no further searching is required
+          return -1;
+        }
+        continue;
+      }else{
+        // find an unsigned literial
         return j;
+      }
     }
-    return -1;
+    // no result found
+    return -2;
   }
 
   void printLiterialMetaList();
