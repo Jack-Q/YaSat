@@ -25,15 +25,23 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
       continue;
     default:
       std::getline(src >> std::ws, s);
-      cls.push_back(parseClause(s));
-      clause_lines++;
+      Clause curClause = parseClause(s);
+      if (curClause.getLiterialCount() > 0){
+        cls.push_back(curClause);
+        clause_lines++;
+      }
+
     }
   }
 
   // Check the header line
   if (header_lines != clause_lines) {
     cout << fmt::warningLabel << "Clause count and file header mismatch! "
-         << endl;
+         << endl
+         << "     Expecting " << fmt::warning << header_lines << fmt::reset
+         << " literials, read " << fmt::error << clause_lines << fmt::reset
+         << " literials." << endl
+         << "     The latter is used." << endl;
   }
   if (header_lits != maxLiterial) {
     cout << fmt::warningLabel
@@ -47,7 +55,7 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
 
 Clause Parser::parseClause(string &s) {
   Clause cls = Clause();
-  vector<Literial>& lits = cls.getList();
+  vector<Literial> &lits = cls.getList();
   std::istringstream str(s);
 
   int number = -1;
@@ -62,7 +70,6 @@ Clause Parser::parseClause(string &s) {
     if (str.eof())
       break;
   }
-
 
   if (number != 0)
     cout << fmt::warningLabel << "Clause line not terminated with 0" << endl;
