@@ -40,3 +40,11 @@ The procedure of this implementation is conforming the following stages:
 1. Effective preprocessing
 1. Random restart
 1. Parallel
+
+
+Resource
+--------
+* [CNFgen on GitHub](https://github.com/MassimoLauria/cnfgen):
+  a python toolkit to generate CNF by encoding some kinds of NP problem with specific parameter
+* [SAT Competition benchmarks](http://baldur.iti.kit.edu/sat-competition-2016/index.php?cat=downloads)
+  benchmark for the SAT Competition

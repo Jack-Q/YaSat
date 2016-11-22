@@ -21,10 +21,6 @@ public:
 
   vector<ClauseWatching *> positiveList;
   vector<ClauseWatching *> negativeList;
-  static inline bool weightPtrComparator(LiterialMeta *lit1,
-                                         LiterialMeta *lit2) {
-    return lit1->weight < lit2->weight;
-  };
 };
 
 class ClauseWatching {
@@ -80,8 +76,7 @@ class Solver {
 public:
   Solver(vector<Clause> &cls, int maxLit, ostream &message)
       : msg(message), maxLiterial(maxLit), clauses(cls),
-        literialMetaList(maxLit),
-        unassignedLiterialQueue(LiterialMeta::weightPtrComparator) {
+        literialMetaList(maxLit), literialMetaPtrOrderList(maxLit) {
     clauseWatchingList.reserve(cls.size() * 2);
     int i = 1;
     for (auto litm = literialMetaList.begin(); litm != literialMetaList.end();
@@ -114,9 +109,7 @@ private:
 
   // Literial list (for global information)
   vector<LiterialMeta> literialMetaList;
-  priority_queue<LiterialMeta *, vector<LiterialMeta *>,
-                 std::function<decltype(LiterialMeta::weightPtrComparator)>>
-      unassignedLiterialQueue;
+  vector<LiterialMeta *> literialMetaPtrOrderList;
 
   // Queue for unique list item
   queue<ClauseWatching *> pendingUniqueClauseWatching;
