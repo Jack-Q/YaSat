@@ -9,22 +9,37 @@
 
 ################### Variables #################
 
+# General
 CXX=g++
 DIRSRC=src
 DIRBIN=.
 DIROBJ=obj
 DIRTEST=test
 SHELL=/bin/bash
+EXENAME=yasat
 
+# Verifier
 DIRVERIFIER=verifier
 BINVERIFIER=$(DIRVERIFIER)/yasat-veri
 
-EXENAME=yasat
+# Compiliance Option
+# set to any non-blank value to toggle these option
+FLAGS_DEBUG=
+FLAGS_COLOR=
+FLAGS_VERBOSE=
 
 # Debugging flags
-FLAGS=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
-         -ggdb3 -DDEBUG -std=c++11
-
+FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
+         -ggdb3 -std=c++11
+ifneq ("$(FLAGS_DEBUG)","")
+	FLAGS := $(FLAGS) -DDEBUG
+endif
+ifneq ("$(FLAGS_COLOR)","")
+	FLAGS := $(FLAGS) -DDEBUG_COLOR
+endif
+ifneq ("$(FLAGS_VERBOSE)","")
+	FLAGS := $(FLAGS) -DDEBUG_VERBOSE
+endif
 # Optimizing flags
 # FLAGS=-Wall -Wold-style-cast -Wformat=2 -ansi -pedantic -O3
 

@@ -24,7 +24,8 @@ This Implementation
 -------------------
 
 Currently, this implementation is merely a naive one with limited capability to
-solve problems with less than 20 variables and 50 clauses.
+solve problems with less than 20 variables and 50 clauses.  For some larger
+problem, the bottle neck is the inefficient memory usage. 
 
 Road map
 -------
@@ -40,6 +41,7 @@ The procedure of this implementation is conforming the following stages:
 - [ ] Effective preprocessing
 - [ ] Random restart
 - [ ] Parallel
+- [ ] Optimize memory usage
 
 Verifier
 --------

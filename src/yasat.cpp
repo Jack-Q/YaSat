@@ -150,7 +150,10 @@ inline void printHelp(ostream &out) {
 }
 
 inline void printClauses(ostream &out, vector<Clause> &clauses) {
-  for (auto cls = clauses.begin(); cls != clauses.end(); cls++)
+  int limit = 50;
+  for (auto cls = clauses.begin(); cls != clauses.end() && --limit; cls++){
     out << *cls << endl;
+  }
+  if(limit == 0) out << fmt::message << "   ..." << fmt::reset << endl;
 }
 }

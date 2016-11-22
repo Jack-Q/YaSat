@@ -15,11 +15,15 @@ void Writer::write(ostream &out, vector<Literial> &solution) {
     out << i->getInt() << " ";
   out << "0" << endl;
 
+  size_t limit = 50;
   msg << fmt::messageLabel << "Result: " << fmt::message << "SATISFIABLE"
       << fmt::reset << endl;
   msg << fmt::messageLabel << "Assignment: ";
-  for (auto i = solution.begin(); i != solution.end(); i++)
+  for (auto i = solution.begin(); i != solution.end() && --limit; i++)
     msg << *i << " ";
   msg << endl;
+  if(solution.size() > 50){
+    msg << fmt::message << "..." << fmt::message << endl;
+  }
 }
 }
