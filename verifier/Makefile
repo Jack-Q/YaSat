@@ -20,4 +20,4 @@ $(EXENAME): main.cpp
 
 .PHONY: clean
 clean:
-	rm $(EXENAME)
+	@rm -f $(EXENAME)
