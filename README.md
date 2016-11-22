@@ -31,20 +31,28 @@ Road map
 
 The procedure of this implementation is conforming the following stages:
 
-1. Naive implementation constructing solver framework
-1. Novice implementation with heuristic branching (simple)
-1. Boolean constraints propagation feature
-1. 2-literal watching
-1. Conflict driven clause learning
-1. Non-chronological backtracking
-1. Effective preprocessing
-1. Random restart
-1. Parallel
+- [x] Naive implementation constructing solver framework
+- [x] Novice implementation with heuristic branching (simple)
+- [x] Boolean constraints propagation feature
+- [x] 2-literal watching
+- [ ] Conflict driven clause learning
+- [ ] Non-chronological backtracking
+- [ ] Effective preprocessing
+- [ ] Random restart
+- [ ] Parallel
 
+Verifier
+--------
+In addition to the solver, this project also contains a handy utility to verify
+whether the solution given by the solver is valid. Since most satisfiable SAT
+have no limit to only one solution, and the order of literal in the solution has
+no matter on the correctness of the solution, the general `diff` tools may be
+inadequate for verifying the output of the solver. Thus, the verifier in this
+project is implemented based on simple checking. This can be found in [verifier](./verifier/) folder
 
 Resource
 --------
 * [CNFgen on GitHub](https://github.com/MassimoLauria/cnfgen):
   a python toolkit to generate CNF by encoding some kinds of NP problem with specific parameter
-* [SAT Competition benchmarks](http://baldur.iti.kit.edu/sat-competition-2016/index.php?cat=downloads)
+* [SAT Competition benchmarks](http://baldur.iti.kit.edu/sat-competition-2016/index.php?cat=downloads):
   benchmark for the SAT Competition
