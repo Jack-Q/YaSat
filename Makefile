@@ -87,7 +87,7 @@ test-tiny: all verifier | dir-test
 	$(BINVERIFIER) -S benchmarks/tiny/rand10_20.cnf $(DIRTEST)/rand10_20.sat
 	@echo "TEST CASE 4"
 	$(DIRBIN)/$(EXENAME) benchmarks/tiny/rand10_50.cnf $(DIRTEST)/rand10_50.sat
-	$(BINVERIFIER) -S benchmarks/tiny/rand10_50.cnf $(DIRTEST)/rand10_50.sat
+	$(BINVERIFIER) -U benchmarks/tiny/rand10_50.cnf $(DIRTEST)/rand10_50.sat
 test-crafted: all verifier | dir-test
 	@echo "###### CRAFTED TEST CASE ######"
 	@echo "TEST CASE 1: fixed bandwidth"
