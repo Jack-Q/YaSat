@@ -9,58 +9,58 @@ void Solver::prep() {
 
   for (auto clause = clauses.begin(); clause != clauses.end(); clause++) {
     sort(clause->getList().begin(), clause->getList().end(),
-         Literial::comparatorValue);
+         Literal::comparatorValue);
 
-    // Update the literial weight
-    int clauseWeight = 10 - clause->getLiterialCount();
+    // Update the literal weight
+    int clauseWeight = 10 - clause->getLiteralCount();
     if (clauseWeight > 0) {
       for (auto lit = clause->getList().begin(); lit != clause->getList().end();
            lit++) {
-        literialMetaList.at(lit->getVal() - 1).weight += clauseWeight;
+        literalMetaList.at(lit->getVal() - 1).weight += clauseWeight;
         if (lit->isPositive()) {
-          literialMetaList.at(lit->getVal() - 1).weightPositive += clauseWeight;
-          // literialMetaList.at(lit->getVal() - 1)
+          literalMetaList.at(lit->getVal() - 1).weightPositive += clauseWeight;
+          // literalMetaList.at(lit->getVal() - 1)
           //     .positiveList.push_back(&*clause);
         } else {
-          literialMetaList.at(lit->getVal() - 1).weightNegative += clauseWeight;
-          // literialMetaList.at(lit->getVal() - 1)
+          literalMetaList.at(lit->getVal() - 1).weightNegative += clauseWeight;
+          // literalMetaList.at(lit->getVal() - 1)
           //     .negativeList.push_back(&*clause);
         }
       }
     }
 
-    // Setup two literial watching
+    // Setup two literal watching
     clauseWatchingList.push_back(ClauseWatching(*clause));
     ClauseWatching &watching = clauseWatchingList.back();
 
     watching.firstWatching = 0;
     addClauseToLiteralList(watching, true);
-    if (clause->getLiterialCount() > 1) {
+    if (clause->getLiteralCount() > 1) {
       watching.secondWatching = 1;
       addClauseToLiteralList(watching, false);
     }
 
     // Handle single variable list
-    if (clause->getLiterialCount() == 1) {
+    if (clause->getLiteralCount() == 1) {
       pendingUniqueClauseWatching.push(&watching);
     }
   }
 
-  for (size_t i = 0; i < literialMetaList.size(); i++) {
-    literialMetaPtrOrderList[i] = &literialMetaList[i];
+  for (size_t i = 0; i < literalMetaList.size(); i++) {
+    literalMetaPtrOrderList[i] = &literalMetaList[i];
   }
-  sort(literialMetaPtrOrderList.begin(), literialMetaPtrOrderList.end(),
-       [](LiterialMeta *lit1, LiterialMeta *lit2) {
+  sort(literalMetaPtrOrderList.begin(), literalMetaPtrOrderList.end(),
+       [](LiteralMeta *lit1, LiteralMeta *lit2) {
          return lit1->weight > lit2->weight;
        });
 
-  printLiterialMetaList();
+  printLiteralMetaList();
   printClauseWatchingList();
 }
 
 void Solver::solve() {
   while (true) {
-    printLiterialMetaList();
+    printLiteralMetaList();
     if (!rollback) {
       // handle initial BCP
       while (!pendingUniqueClauseWatching.empty()) {
@@ -71,9 +71,9 @@ void Solver::solve() {
         msg << fmt::messageLabel << "handle unique clause " << *watching
             << endl;
 #endif
-        // place the unique literial at the first position
-        Bool result_1 = watchingLiterialStatus(*watching, true);
-        Bool result_2 = watchingLiterialStatus(*watching, false);
+        // place the unique literal at the first position
+        Bool result_1 = watchingLiteralStatus(*watching, true);
+        Bool result_2 = watchingLiteralStatus(*watching, false);
         if (result_1.isAssigned() && result_2.isAssigned()) {
           if (result_1.isTrue() || result_2.isTrue()) {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -92,9 +92,9 @@ void Solver::solve() {
         if (result_1.isAssigned())
           watching->swapWatchingIndex();
 
-        Literial &lit = watching->clause[watching->firstWatching];
-        LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
-        literialAssignmentList.push_back(LiterialAssignment(litM));
+        Literal &lit = watching->clause[watching->firstWatching];
+        LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
+        literalAssignmentList.push_back(LiteralAssignment(litM));
 
         if (lit.isPositive()) {
 // Perform possible assignment
@@ -103,7 +103,7 @@ void Solver::solve() {
               << fmt::reset << ": " << litM.listValue << " -> "
               << Bool::getTrueValue() << endl;
 #endif
-          if (updateWatchingLiterial(litM, Bool::getTrueValue()) < 0) {
+          if (updateWatchingLiteral(litM, Bool::getTrueValue()) < 0) {
             rollbackAfterConflict();
           }
         } else {
@@ -113,7 +113,7 @@ void Solver::solve() {
               << fmt::reset << ": " << litM.listValue << " -> "
               << Bool::getFalseValue() << endl;
 #endif
-          if (updateWatchingLiterial(litM, Bool::getFalseValue()) < 0) {
+          if (updateWatchingLiteral(litM, Bool::getFalseValue()) < 0) {
             rollbackAfterConflict();
           }
         }
@@ -125,20 +125,20 @@ void Solver::solve() {
       msg << fmt::messageLabel << "Make decision" << endl;
 #endif
       bool assign = false;
-      for (auto nxtPtr = literialMetaPtrOrderList.begin();
-           nxtPtr < literialMetaPtrOrderList.end(); nxtPtr++) {
+      for (auto nxtPtr = literalMetaPtrOrderList.begin();
+           nxtPtr < literalMetaPtrOrderList.end(); nxtPtr++) {
         auto nxt = *nxtPtr;
         if (nxt->assignmet.isAssigned())
           continue;
-        literialAssignmentList.push_back(LiterialAssignment(
-            *nxt, LiterialAssignment::LITERIAL_ASSIGN_DECISION));
+        literalAssignmentList.push_back(LiteralAssignment(
+            *nxt, LiteralAssignment::LITERIAL_ASSIGN_DECISION));
         if (nxt->weightPositive > nxt->weightNegative) {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
           msg << fmt::messageLabel << "Make " << fmt::error << "decision"
               << fmt::reset << ": " << nxt->listValue << " -> "
               << Bool::getFalseValue() << endl;
 #endif
-          if (updateWatchingLiterial(*nxt, Bool::getFalseValue()) < 0) {
+          if (updateWatchingLiteral(*nxt, Bool::getFalseValue()) < 0) {
             rollbackAfterConflict();
             break;
           }
@@ -148,7 +148,7 @@ void Solver::solve() {
               << fmt::reset << ": " << nxt->listValue << " -> "
               << Bool::getTrueValue() << endl;
 #endif
-          if (updateWatchingLiterial(*nxt, Bool::getTrueValue()) < 0) {
+          if (updateWatchingLiteral(*nxt, Bool::getTrueValue()) < 0) {
             rollbackAfterConflict();
             break;
           }
@@ -163,35 +163,35 @@ void Solver::solve() {
         return;
       }
       rollback = false;
-      LiterialMeta &litM = literialAssignmentList.back().getLiterialMeta();
+      LiteralMeta &litM = literalAssignmentList.back().getLiteralMeta();
 
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
       msg << fmt::messageLabel << "Rollback, make another " << fmt::error
           << "decision" << fmt::reset << ": " << litM.listValue << " -> "
           << litM.assignmet << endl;
 #endif
-      if (updateWatchingLiterial(litM, litM.assignmet) < 0)
+      if (updateWatchingLiteral(litM, litM.assignmet) < 0)
         rollbackAfterConflict();
     }
   }
 }
 
-void Solver::getSolution(vector<Literial> &sol) {
+void Solver::getSolution(vector<Literal> &sol) {
   sol.clear();
   if (unsatisfiable)
     return;
-  for (auto litm = literialMetaList.begin(); litm != literialMetaList.end();
+  for (auto litm = literalMetaList.begin(); litm != literalMetaList.end();
        litm++) {
-    sol.push_back(Literial(litm->listValue, litm->assignmet.getValue(),
+    sol.push_back(Literal(litm->listValue, litm->assignmet.getValue(),
                            Bool::BOOL_UNASSIGN));
   }
 }
 
 void Solver::addClauseToLiteralList(ClauseWatching &watching, int isFirst) {
-  Literial &lit =
+  Literal &lit =
       watching
           .clause[isFirst ? watching.firstWatching : watching.secondWatching];
-  LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+  LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
   if (lit.isPositive()) {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
     msg << fmt::messageLabel << "add clause" << watching
@@ -207,12 +207,12 @@ void Solver::addClauseToLiteralList(ClauseWatching &watching, int isFirst) {
   }
 }
 
-void Solver::removeClauseFromLiterialList(ClauseWatching &watching,
+void Solver::removeClauseFromLiteralList(ClauseWatching &watching,
                                           int isFirst) {
-  Literial &lit =
+  Literal &lit =
       watching
           .clause[isFirst ? watching.firstWatching : watching.secondWatching];
-  LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+  LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
   if (lit.isPositive()) {
 
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -233,9 +233,9 @@ void Solver::removeClauseFromLiterialList(ClauseWatching &watching,
   }
 }
 
-Bool Solver::clauseLiterialStatus(Clause &clause, int index) const {
-  Literial &lit = clause[index];
-  const LiterialMeta &litM = literialMetaList[lit.getVal() - 1];
+Bool Solver::clauseLiteralStatus(Clause &clause, int index) const {
+  Literal &lit = clause[index];
+  const LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
   if (litM.assignmet.isAssigned()) {
     return ((litM.assignmet.isTrue() && lit.isPositive()) ||
             (!litM.assignmet.isTrue() && !lit.isPositive()))
@@ -247,7 +247,7 @@ Bool Solver::clauseLiterialStatus(Clause &clause, int index) const {
   }
 }
 
-Bool Solver::watchingLiterialStatus(ClauseWatching &watching,
+Bool Solver::watchingLiteralStatus(ClauseWatching &watching,
                                     bool isFirst) const {
   int watchingIndex =
       isFirst ? watching.firstWatching : watching.secondWatching;
@@ -255,19 +255,19 @@ Bool Solver::watchingLiterialStatus(ClauseWatching &watching,
     // Even though there is no watched variable, this one is satisfied, anyway
     return Bool::getFalseValue();
   }
-  return clauseLiterialStatus(watching.clause, watchingIndex);
+  return clauseLiteralStatus(watching.clause, watchingIndex);
 }
 
-int Solver::findNextWatchingLiterial(ClauseWatching &watching) const {
+int Solver::findNextWatchingLiteral(ClauseWatching &watching) const {
   int i = max(watching.firstWatching, watching.secondWatching);
-  int c = watching.clause.getLiterialCount();
+  int c = watching.clause.getLiteralCount();
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
   msg << fmt::messageLabel << "Find next watching item in " << watching << endl;
 #endif
   for (int j = (i + 1) % c; j != i; j = (j + 1) % c) {
     if ((j == watching.firstWatching) || (j == watching.secondWatching))
       continue;
-    Bool litStatus = clauseLiterialStatus(watching.clause, j);
+    Bool litStatus = clauseLiteralStatus(watching.clause, j);
     if (litStatus.isAssigned()) {
       if (litStatus.isTrue()) {
         // since current clause is already satisfied, no further searching is
@@ -276,7 +276,7 @@ int Solver::findNextWatchingLiterial(ClauseWatching &watching) const {
       }
       continue;
     } else {
-      // find an unsigned literial
+      // find an unsigned literal
       return j;
     }
   }
@@ -284,12 +284,12 @@ int Solver::findNextWatchingLiterial(ClauseWatching &watching) const {
   return -2;
 }
 
-void Solver::printLiterialMetaList() {
+void Solver::printLiteralMetaList() {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
   msg << fmt::messageLabel << "LitMeta: ";
   int limit = 100;
-  for (auto i = literialMetaList.begin();
-       i != literialMetaList.end() && limit--; i++) {
+  for (auto i = literalMetaList.begin();
+       i != literalMetaList.end() && limit--; i++) {
     msg << (i->assignmet.isAssigned()
                 ? i->assignmet.isTrue() ? fmt::message : fmt::negative
                 : fmt::positive)
@@ -316,7 +316,7 @@ void Solver::printClauseWatchingList() {
 #endif
 }
 
-int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
+int Solver::updateWatchingLiteral(LiteralMeta &litM, Bool assignValue) {
   litM.assignmet = assignValue;
   auto &clauseUpdateList =
       assignValue.isTrue() ? litM.negativeList : litM.positiveList;
@@ -324,7 +324,7 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
        /*Since iterator may invalidate during update, the increament
        depend on specific operation*/) {
     ClauseWatching *curWat = *i;
-    Literial *curLit = nullptr;
+    Literal *curLit = nullptr;
     if (curWat->firstWatching >= 0) {
       curLit = &curWat->clause[curWat->firstWatching];
       if (curLit->getVal() != litM.listValue) {
@@ -338,19 +338,19 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
       curLit = &curWat->clause[curWat->firstWatching];
     }
 
-    int nextIndex = findNextWatchingLiterial(*curWat);
+    int nextIndex = findNextWatchingLiteral(*curWat);
 
     if (nextIndex == -2) {
       // curWat->firstWatching = curWat->secondWatching;
       // curWat->secondWatching = -1;
-      Bool result = watchingLiterialStatus(*curWat, false);
+      Bool result = watchingLiteralStatus(*curWat, false);
       if (result.isAssigned() && !result.isTrue()) {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
         msg << fmt::messageLabel << fmt::error << "find conflict" << fmt::reset
             << endl;
         msg << fmt::messageLabel << "conflict @ " << *curWat << endl;
 #endif
-        printLiterialMetaList();
+        printLiteralMetaList();
         return -1;
       }
       if (!result.isAssigned()) {
@@ -364,12 +364,12 @@ int Solver::updateWatchingLiterial(LiterialMeta &litM, Bool assignValue) {
 // this clause is satisfied
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
       msg << fmt::messageLabel << " current clause \"" << *curWat
-          << "\"is satisfied already, don't need to update watching literial "
+          << "\"is satisfied already, don't need to update watching literal "
           << endl;
 #endif
       i++; // update iterator
     } else {
-      // removeClauseFromLiterialList(*curWat, 1);
+      // removeClauseFromLiteralList(*curWat, 1);
       // this will erease current element and return next valid iterator
       i = clauseUpdateList.erase(i);
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -389,27 +389,27 @@ void Solver::rollbackAfterConflict() {
   // Clear pending unique clause
   while (!pendingUniqueClauseWatching.empty())
     pendingUniqueClauseWatching.pop();
-  while (!literialAssignmentList.empty()) {
-    LiterialAssignment &lastAssignment = literialAssignmentList.back();
+  while (!literalAssignmentList.empty()) {
+    LiteralAssignment &lastAssignment = literalAssignmentList.back();
     if (lastAssignment.isDecision()) {
       // Decision
       if (lastAssignment.isFirstAssign()) {
         lastAssignment.nextAssign();
-        if (lastAssignment.getLiterialMeta().assignmet.isTrue()) {
-          lastAssignment.getLiterialMeta().assignmet = Bool::getFalseValue();
+        if (lastAssignment.getLiteralMeta().assignmet.isTrue()) {
+          lastAssignment.getLiteralMeta().assignmet = Bool::getFalseValue();
         } else {
-          lastAssignment.getLiterialMeta().assignmet = Bool::getTrueValue();
+          lastAssignment.getLiteralMeta().assignmet = Bool::getTrueValue();
         }
         return;
       } else {
-        lastAssignment.getLiterialMeta().assignmet = Bool::getUnsignedValue();
-        literialAssignmentList.pop_back();
+        lastAssignment.getLiteralMeta().assignmet = Bool::getUnsignedValue();
+        literalAssignmentList.pop_back();
       }
     } else {
       // Implication
-      lastAssignment.getLiterialMeta().assignmet =
+      lastAssignment.getLiteralMeta().assignmet =
           Bool::Bool::getUnsignedValue();
-      literialAssignmentList.pop_back();
+      literalAssignmentList.pop_back();
     }
   }
   unsatisfiable = true;

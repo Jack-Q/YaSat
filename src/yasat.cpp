@@ -105,11 +105,11 @@ void YaSat::loadClause() {
   parser.parse(*inputDataSource, clauses);
   message() << fmt::messageLabel << "Clauses after load:" << endl;
   printClauses(message(), clauses);
-  maxLiterial = parser.getMaxLiterial();
+  maxLiteral = parser.getMaxLiteral();
 }
 
 void YaSat::solve() {
-  Solver solver(clauses, maxLiterial, message());
+  Solver solver(clauses, maxLiteral, message());
 
   solver.prep();
   message() << fmt::messageLabel << "Clauses after preparation step:" << endl;

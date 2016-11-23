@@ -10,15 +10,15 @@ public:
   Parser(ostream &message) : msg(message) { reset(); }
 
   void parse(istream &src, vector<Clause> &cls);
-  void reset() { header_lits = header_lines = clause_lines = maxLiterial = 0; }
+  void reset() { header_lits = header_lines = clause_lines = maxLiteral = 0; }
 
-  inline int getMaxLiterial() const { return maxLiterial; }
+  inline int getMaxLiteral() const { return maxLiteral; }
 
 private:
   int header_lines;
   int header_lits;
   int clause_lines;
-  int maxLiterial;
+  int maxLiteral;
 
   Clause parseClause(string &s);
   ostream &msg;

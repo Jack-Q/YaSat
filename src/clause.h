@@ -4,7 +4,7 @@
 #include "util.h"
 
 namespace yasat {
-class Literial;
+class Literal;
 class Bool {
 public:
   Bool() : value(0u){};
@@ -59,52 +59,52 @@ public:
   inline friend ostream &operator<<(ostream &out, Bool &b) {
     return out << (b.isAssigned() ? (b.isTrue() ? "TRUE" : "FALSE") : "UNDET");
   }
-  friend Literial;
+  friend Literal;
 };
 
-class Literial {
+class Literal {
   // Use 3 bit for last state
 public:
   const static unsigned LITERIAL_POSITIVE = 1 << 2;
   const static unsigned LITERIAL_NEGATIVE = 0 << 2;
   const static unsigned LITERIAL_FORM_MASK = ~4u;
   const static unsigned ASSIGNMENT_MASK = ~3u;
-  Literial() : value(0) {}
-  Literial(int num) : Literial() {
+  Literal() : value(0) {}
+  Literal(int num) : Literal() {
     if (num < 0)
       value = Bool::BOOL_UNASSIGN | LITERIAL_NEGATIVE | (-num << 3);
     else if (num > 0)
       value = Bool::BOOL_UNASSIGN | LITERIAL_POSITIVE | (num << 3);
   }
-  Literial(int num, Bool assign) : Literial(num) {
+  Literal(int num, Bool assign) : Literal(num) {
     value &= ASSIGNMENT_MASK;
     value |= assign.value;
   }
-  Literial(unsigned int num, unsigned int sign, unsigned int assign) {
+  Literal(unsigned int num, unsigned int sign, unsigned int assign) {
     value = num << 3 | (sign & 1) << 2 | assign;
   }
 
   // Get integer representation form
   inline int getInt() const { return isPositive() ? getVal() : -getVal(); }
 
-  // Get the literial
+  // Get the literal
   inline int getVal() const { return value >> 3; }
 
-  // whether the literial is positive (1) or negative (0)
+  // whether the literal is positive (1) or negative (0)
   inline int isPositive() const { return (value & 4u) >> 2; }
 
   // get bool
   inline Bool getBool() const { return Bool(value, isPositive()); }
 
-  typedef bool (*comparator)(Literial &, Literial &);
-  inline static bool comparatorValue(Literial &a, Literial &b) {
+  typedef bool (*comparator)(Literal &, Literal &);
+  inline static bool comparatorValue(Literal &a, Literal &b) {
     return a.value < b.value;
   }
 
 private:
   // the value is aligned with the form of Bool class
   unsigned int value;
-  inline friend ostream &operator<<(ostream &out, Literial lit) {
+  inline friend ostream &operator<<(ostream &out, Literal lit) {
     return out << (lit.isPositive() ? fmt::positive : fmt::negative)
                << lit.getVal() << fmt::reset;
   }
@@ -115,21 +115,21 @@ public:
   Clause() {}
   ~Clause() {}
 
-  inline vector<Literial> &getList() { return lits; }
+  inline vector<Literal> &getList() { return lits; }
 
-  inline Literial &getLiterial(int at){
+  inline Literal &getLiteral(int at){
     return lits.at(at);
   }
 
-  inline int getLiterialCount() const{
+  inline int getLiteralCount() const{
     return lits.size();
   }
 
-  inline Literial& operator[](int at){
+  inline Literal& operator[](int at){
     return lits.at(at);
   }
 private:
-  vector<Literial> lits;
+  vector<Literal> lits;
   inline friend ostream &operator<<(ostream &out, Clause cls) {
     for (auto i = cls.lits.begin(); i < cls.lits.end(); i++)
       out << *i << " ";

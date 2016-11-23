@@ -7,9 +7,9 @@
 namespace yasat {
 
 class ClauseWatching;
-class LiterialMeta {
+class LiteralMeta {
 public:
-  LiterialMeta() : weight(0), weightPositive(0), weightNegative(0) {}
+  LiteralMeta() : weight(0), weightPositive(0), weightNegative(0) {}
 
   int listValue;
   Bool assignmet;
@@ -40,7 +40,7 @@ public:
 
 private:
   friend ostream &operator<<(ostream &o, ClauseWatching &w) {
-    for (int j = 0; j < w.clause.getLiterialCount(); j++) {
+    for (int j = 0; j < w.clause.getLiteralCount(); j++) {
       if (j == w.firstWatching || j == w.secondWatching) {
         o << " [" << w.clause[j] << "] ";
       } else {
@@ -51,35 +51,35 @@ private:
   }
 };
 
-// Assignment of literial, including decisoin and implcation
-class LiterialAssignment {
+// Assignment of literal, including decisoin and implcation
+class LiteralAssignment {
 public:
   static const int LITERIAL_ASSIGN_DECISION = 1;
   static const int LITERIAL_ASSIGN_IMPLICATION = 0;
-  LiterialAssignment(LiterialMeta &litMeta,
+  LiteralAssignment(LiteralMeta &litMeta,
                      int type = LITERIAL_ASSIGN_IMPLICATION)
       : type(type), firstAssign(true), litM(litMeta) {}
 
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
   inline bool isFirstAssign() const { return firstAssign; }
   void nextAssign() { firstAssign = false; }
-  LiterialMeta &getLiterialMeta() { return litM; }
+  LiteralMeta &getLiteralMeta() { return litM; }
 
 private:
   int type;
   // Each decision assignment ought to have two possible decisions to try
   bool firstAssign;
-  LiterialMeta &litM;
+  LiteralMeta &litM;
 };
 
 class Solver {
 public:
   Solver(vector<Clause> &cls, int maxLit, ostream &message)
-      : msg(message), maxLiterial(maxLit), clauses(cls),
-        literialMetaList(maxLit), literialMetaPtrOrderList(maxLit) {
+      : msg(message), maxLiteral(maxLit), clauses(cls),
+        literalMetaList(maxLit), literalMetaPtrOrderList(maxLit) {
     clauseWatchingList.reserve(cls.size() * 2);
     int i = 1;
-    for (auto litm = literialMetaList.begin(); litm != literialMetaList.end();
+    for (auto litm = literalMetaList.begin(); litm != literalMetaList.end();
          litm++) {
       litm->listValue = i++;
     }
@@ -89,13 +89,13 @@ public:
 
   void solve();
 
-  void getSolution(vector<Literial> &sol);
+  void getSolution(vector<Literal> &sol);
 
 private:
   // informative
   ostream &msg;
 
-  int maxLiterial;
+  int maxLiteral;
   bool rollback = false;
   bool unsatisfiable = false;
 
@@ -105,34 +105,34 @@ private:
 
   void addClauseToLiteralList(ClauseWatching &watching, int isFirst);
 
-  void removeClauseFromLiterialList(ClauseWatching &watching, int isFirst);
+  void removeClauseFromLiteralList(ClauseWatching &watching, int isFirst);
 
-  // Literial list (for global information)
-  vector<LiterialMeta> literialMetaList;
-  vector<LiterialMeta *> literialMetaPtrOrderList;
+  // Literal list (for global information)
+  vector<LiteralMeta> literalMetaList;
+  vector<LiteralMeta *> literalMetaPtrOrderList;
 
   // Queue for unique list item
   queue<ClauseWatching *> pendingUniqueClauseWatching;
 
   // Stack for assignment history
-  vector<LiterialAssignment> literialAssignmentList;
+  vector<LiteralAssignment> literalAssignmentList;
 
   // utility functinos
-  Bool clauseLiterialStatus(Clause &clause, int index) const;
+  Bool clauseLiteralStatus(Clause &clause, int index) const;
 
-  Bool watchingLiterialStatus(ClauseWatching &watching, bool isFirst) const;
+  Bool watchingLiteralStatus(ClauseWatching &watching, bool isFirst) const;
 
-  // Find next literial that can be watched
-  // this will skip the status of current watched literials
+  // Find next literal that can be watched
+  // this will skip the status of current watched literals
   // return -1 if chrrent clause is already satisfied
-  // return -2 if all other literials are assigned and failed
-  int findNextWatchingLiterial(ClauseWatching &watching) const;
+  // return -2 if all other literals are assigned and failed
+  int findNextWatchingLiteral(ClauseWatching &watching) const;
 
-  void printLiterialMetaList();
+  void printLiteralMetaList();
 
   void printClauseWatchingList();
 
-  int updateWatchingLiterial(LiterialMeta &litM, Bool assignValue);
+  int updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
 
   void rollbackAfterConflict();
 };

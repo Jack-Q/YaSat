@@ -19,14 +19,14 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
       src.ignore();
       src >> s >> header_lits >> header_lines;
       cout << fmt::messageLabel << "Header says: " << s << " file type with "
-           << header_lines << " clauses, " << header_lits << " literials"
+           << header_lines << " clauses, " << header_lits << " literals"
            << endl;
       src.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
     default:
       std::getline(src >> std::ws, s);
       Clause curClause = parseClause(s);
-      if (curClause.getLiterialCount() > 0){
+      if (curClause.getLiteralCount() > 0){
         cls.push_back(curClause);
         clause_lines++;
       }
@@ -39,23 +39,23 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
     cout << fmt::warningLabel << "Clause count and file header mismatch! "
          << endl
          << "     Expecting " << fmt::warning << header_lines << fmt::reset
-         << " literials, read " << fmt::error << clause_lines << fmt::reset
-         << " literials." << endl
+         << " literals, read " << fmt::error << clause_lines << fmt::reset
+         << " literals." << endl
          << "     The latter is used." << endl;
   }
-  if (header_lits != maxLiterial) {
+  if (header_lits != maxLiteral) {
     cout << fmt::warningLabel
-         << "Actual number of literials is not as the header says." << endl
+         << "Actual number of literals is not as the header says." << endl
          << "     Expecting " << fmt::warning << header_lits << fmt::reset
-         << " literials, read " << fmt::error << maxLiterial << fmt::reset
-         << " literials." << endl
+         << " literals, read " << fmt::error << maxLiteral << fmt::reset
+         << " literals." << endl
          << "     The latter is used." << endl;
   }
 }
 
 Clause Parser::parseClause(string &s) {
   Clause cls = Clause();
-  vector<Literial> &lits = cls.getList();
+  vector<Literal> &lits = cls.getList();
   std::istringstream str(s);
 
   int number = -1;
@@ -63,9 +63,9 @@ Clause Parser::parseClause(string &s) {
     str >> number;
     if (number == 0)
       break;
-    lits.push_back(Literial(number));
-    if (abs(number) > maxLiterial)
-      maxLiterial = number;
+    lits.push_back(Literal(number));
+    if (abs(number) > maxLiteral)
+      maxLiteral = number;
     str >> std::ws;
     if (str.eof())
       break;
@@ -76,7 +76,7 @@ Clause Parser::parseClause(string &s) {
   if (lits.empty())
     cout << fmt::warningLabel << "Empty clause line" << endl;
   if (!str.eof())
-    cout << fmt::warningLabel << "Literials after 0 in a CNF line is ignored"
+    cout << fmt::warningLabel << "Literals after 0 in a CNF line is ignored"
          << endl;
 
   return cls;

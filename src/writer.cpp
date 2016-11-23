@@ -2,7 +2,7 @@
 
 namespace yasat {
 
-void Writer::write(ostream &out, vector<Literial> &solution) {
+void Writer::write(ostream &out, vector<Literal> &solution) {
   if (solution.empty()) {
     out << "s UNSATISFIABLE" << endl;
     msg << fmt::messageLabel << "Result: " << fmt::error << "UNSATISFIABLE"

@@ -9,7 +9,7 @@ class Writer{
 public:
   Writer(ostream &message): msg(message){}
 
-  void write(ostream &out, vector<Literial> &literials);
+  void write(ostream &out, vector<Literal> &literals);
 private:
   ostream &msg;
 };

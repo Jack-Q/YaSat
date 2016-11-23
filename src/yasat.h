@@ -35,9 +35,9 @@ public:
 private:
   // State
   int state;
-  int maxLiterial;
+  int maxLiteral;
   vector<Clause> clauses;
-  vector<Literial> solution;
+  vector<Literal> solution;
 
   // IO destination
   istream *inputDataSource;
