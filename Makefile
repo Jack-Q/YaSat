@@ -25,14 +25,16 @@ BINVERIFIER=$(DIRVERIFIER)/yasat-veri
 # Compiliance Option
 # set to any non-blank value to toggle these option
 FLAGS_DEBUG=
-FLAGS_COLOR=
+FLAGS_COLOR=1
 FLAGS_VERBOSE=
 
 # Debugging flags
 FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
-         -ggdb3 -std=c++11
+          -std=c++11
 ifneq ("$(FLAGS_DEBUG)","")
-	FLAGS := $(FLAGS) -DDEBUG
+	FLAGS := $(FLAGS) -DDEBUG -ggdb3
+else
+	FLAGS := $(FLAGS) -O2 -O3
 endif
 ifneq ("$(FLAGS_COLOR)","")
 	FLAGS := $(FLAGS) -DDEBUG_COLOR
