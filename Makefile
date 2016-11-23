@@ -87,8 +87,8 @@ test-sanity: all verifier | dir-test
 	$(DIRBIN)/$(EXENAME) benchmarks/sanity/sanity4.cnf $(DIRTEST)/sanity4.sat > /dev/null
 	$(BINVERIFIER) -U benchmarks/sanity/sanity4.cnf $(DIRTEST)/sanity4.sat
 	@echo "TEST CASE 4"
-	$(BINVERIFIER) -U benchmarks/sanity/sanity5.cnf $(DIRTEST)/sanity5.sat
 	$(DIRBIN)/$(EXENAME) benchmarks/sanity/sanity5.cnf $(DIRTEST)/sanity5.sat > /dev/null
+	$(BINVERIFIER) -U benchmarks/sanity/sanity5.cnf $(DIRTEST)/sanity5.sat
 test-tiny: all verifier | dir-test
 	@echo "####### TINY TEST CASE #######"
 	@echo "TEST CASE 1"
