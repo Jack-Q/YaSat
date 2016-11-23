@@ -34,14 +34,59 @@ The procedure of this implementation is conforming the following stages:
 
 - [x] Naive implementation constructing solver framework
 - [x] Novice implementation with heuristic branching (simple)
-- [x] Boolean constraints propagation feature
+- [x] Boolean constraints propagation feature (DPLL)
 - [x] 2-literal watching
-- [ ] Conflict driven clause learning
+- [ ] Conflict driven clause learning (1UIP)
 - [ ] Non-chronological backtracking
 - [ ] Effective preprocessing
 - [ ] Random restart
 - [ ] Parallel
 - [ ] Optimize memory usage
+
+Currently, this project arrives its milestone 1, at which simple SAT problem can be solved with DPLL and 2-literal watching features. In the following milestone 2, the following tasks are planed:
+
+- [ ] 1UIP based conflict driven clause leraning 
+- [ ] non-chronological backtracking
+- [ ] random restart
+- [ ] rewrite message and debug log utility
+- [ ] add more options for command line interface
+- [ ] add statistics during problem solving
+
+Usage
+-----
+### Compile ###
+
+```bash
+# cd to the projec directory before compiling
+
+# take defualt configuration
+make
+
+# set the option to non-empty value to enable these options
+make FLAGS_DEBUG=1 FLAGS_COLOR=1 FLAGS_VERBOSE=
+
+# test the program with diffenent set of SAT problem
+make test-sanity
+make test-tiny
+make test-crafted  # this cannot finish currently
+# use both the sanity and tiny problem
+make test
+```
+
+Options:
+* Debug mode (`FLAGS_DEBUG`)
+* Color output (`FLAGS_COLOR`) 
+* Verbose message (`FLAGS_VERBOSE`) 
+
+### Execution ###
+
+```bash
+# specify the input file and output file
+./yasat [ input-file | --stdin ] [ output-file | --stdout ]
+
+# print help message
+./yasat --help
+```
 
 Verifier
 --------
