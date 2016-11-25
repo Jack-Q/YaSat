@@ -35,7 +35,7 @@ FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
 ifneq ("$(FLAGS_DEBUG)","")
 	FLAGS := $(FLAGS) -DDEBUG -ggdb3 # Debug flags
 else
-	FLAGS := $(FLAGS) -O2 -O3				 # Release flags
+	FLAGS := $(FLAGS) -O2 -O3 # Release flags
 endif
 ifneq ("$(FLAGS_COLOR)","")
 	FLAGS := $(FLAGS) -DDEBUG_COLOR
@@ -129,25 +129,25 @@ test-m2-simple: all verifier | dir-test
 	$(BINVERIFIER) -S benchmarks/m2-simple/jnh1.cnf $(DIRTEST)/jnh1.sat
 	@echo "TEST CASE 6: John Hooker 10"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/jnh10.cnf $(DIRTEST)/jnh10.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-simple/jnh10.cnf $(DIRTEST)/jnh10.sat
+	$(BINVERIFIER) -U benchmarks/m2-simple/jnh10.cnf $(DIRTEST)/jnh10.sat
 	@echo "TEST CASE 7: John Hooker 11"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/jnh11.cnf $(DIRTEST)/jnh11.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-simple/jnh11.cnf $(DIRTEST)/jnh11.sat
+	$(BINVERIFIER) -U benchmarks/m2-simple/jnh11.cnf $(DIRTEST)/jnh11.sat
 	@echo "TEST CASE 8: Inductive Inference (8)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/ii8a1.cnf $(DIRTEST)/ii8a1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-simple/ii8a1.cnf $(DIRTEST)/ii8a1.sat
 	@echo "TEST CASE 9: Dubois (20)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/dubois20.cnf $(DIRTEST)/dubois20.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-simple/dubois20.cnf $(DIRTEST)/dubois20.sat
+	$(BINVERIFIER) -U benchmarks/m2-simple/dubois20.cnf $(DIRTEST)/dubois20.sat
 	@echo "TEST CASE 10: Artificial Instance 50 (Satisfiabile)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-50-1_6-yes-1.cnf $(DIRTEST)/aim-50-1_6-yes-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/aim-50-1_6-yes-1.cnf $(DIRTEST)/aim-50-1_6-yes-1.sat
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-50-1_6-yes1-1.cnf $(DIRTEST)/aim-50-1_6-yes1-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/aim-50-1_6-yes1-1.cnf $(DIRTEST)/aim-50-1_6-yes1-1.sat
 	@echo "TEST CASE 11: Artificial Instance 50 (Unsatisfiabile)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-50-1_6-no-1.cnf $(DIRTEST)/aim-50-1_6-no-1.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-simple/aim-50-1_6-no-1.cnf $(DIRTEST)/aim-50-1_6-no-1.sat
+	$(BINVERIFIER) -U benchmarks/m2-simple/aim-50-1_6-no-1.cnf $(DIRTEST)/aim-50-1_6-no-1.sat
 	@echo "TEST CASE 12: Artificial Instance 100 (Satisfiabile)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-100-1_6-yes-1.cnf $(DIRTEST)/aim-100-1_6-yes-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/aim-100-1_6-yes-1.cnf $(DIRTEST)/aim-100-1_6-yes-1.sat
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-100-1_6-yes1-1.cnf $(DIRTEST)/aim-100-1_6-yes1-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/aim-100-1_6-yes1-1.cnf $(DIRTEST)/aim-100-1_6-yes1-1.sat
 test-m2-hard: all verifier | dir-test
 	@echo "###### M2-HARD TEST CASE ######"
 	@echo "TEST CASE 1: Parity 32bit (Simplified)"
@@ -164,16 +164,16 @@ test-m2-hard: all verifier | dir-test
 	$(BINVERIFIER) -S benchmarks/m2-hard/ii32a1.cnf $(DIRTEST)/ii32a1.sat
 	@echo "TEST CASE 5: Dubois (100)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/dubois100.cnf $(DIRTEST)/dubois100.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-hard/dubois100.cnf $(DIRTEST)/dubois100.sat
+	$(BINVERIFIER) -U benchmarks/m2-hard/dubois100.cnf $(DIRTEST)/dubois100.sat
 	@echo "TEST CASE 6: Artificial Instance 100 (Unsatisfiabile)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-hard/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat
+	$(BINVERIFIER) -U benchmarks/m2-hard/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat
 	@echo "TEST CASE 7: Artificial Instance 200 (Satisfiabile)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-200-1_6-yes-1.cnf $(DIRTEST)/aim-200-1_6-yes-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-hard/aim-200-1_6-yes-1.cnf $(DIRTEST)/aim-200-1_6-yes-1.sat
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-200-1_6-yes1-1.cnf $(DIRTEST)/aim-200-1_6-yes1-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-hard/aim-200-1_6-yes1-1.cnf $(DIRTEST)/aim-200-1_6-yes1-1.sat
 	@echo "TEST CASE 8: Artificial Instance 200 (Unsatisfiabile)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat > /dev/null
-	$(BINVERIFIER) -N benchmarks/m2-hard/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat
+	$(BINVERIFIER) -U benchmarks/m2-hard/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat
 test-crafted: all verifier | dir-test
 	@echo "###### CRAFTED TEST CASE ######"
 	@echo "TEST CASE 1: fixed bandwidth"

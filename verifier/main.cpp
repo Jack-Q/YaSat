@@ -60,8 +60,8 @@ extern int errno;
 
 void printUsage(const char *progname = "yasat-veri") {
   std::cout << FMT(gre, [USAGE]) << " " << progname
-            << " [ -S | -N ] [CNF INPUT] [SAT OUTPUT]" << std::endl;
-  std::cout << "  >> " << FMT(whi, [-S | -N])
+            << " [ -S | -U ] [CNF INPUT] [SAT OUTPUT]" << std::endl;
+  std::cout << "  >> " << FMT(whi, [-S | -U])
             << "  : the expected result of the input cnf file, `-S' for "
             << "Satisfiabile and `-U' for unsatisfiable." << std::endl;
   std::cout << "  >> " << FMT(whi, [CNF INPUT])
