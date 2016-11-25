@@ -8,17 +8,17 @@
  * SatSolver output verifier
  **********************************************/
 
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
 #include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #ifdef DEBUG
-#define DEBUG_INFO(x) std::cout<<FMT(gre, [MESSAGE])<<" " x << std::endl
+#define DEBUG_INFO(x) std::cout << FMT(gre, [MESSAGE]) << " " x << std::endl
 #else
 #define DEBUG_INFO(x)
 #endif
@@ -72,11 +72,48 @@ void printUsage(const char *progname = "yasat-veri") {
             << " -S input.cnf result.sat " << std::endl;
 }
 
-int result(bool isMatch){
-  if(isMatch){
+void printErrorClause(std::vector<int> &lits, std::vector<int> &status) {
+  std::cout << FMT(red, [ERROR]) << " the assignment cannot satisfy clause: ";
+  for (size_t i = 0; i < lits.size(); i++) {
+    switch (status[i]) {
+    case 2:
+      std::cout << FMT(yel) << lits[i] << " " << FMT(rst);
+      break;
+    case 1:
+      std::cout << FMT(red) << lits[i] << " " << FMT(rst);
+      break;
+    case 0:
+      std::cout << lits[i] << " ";
+      break;
+    }
+  }
+  std::cout << std::endl;
+}
+
+void printOutOfIndexErrorClause(std::vector<int> &lits,
+                                std::vector<int> &status) {
+
+  for (size_t i = 0; i < lits.size(); i++) {
+    if (status[i] != 2)
+      continue;
+    std::cout << FMT(red, [ERROR])
+              << " result hasn't cover the literial of index " << FMT(red)
+              << i + 1 << FMT(rst) << " in clause ";
+    for (size_t j = 0; j < lits.size(); j++) {
+      if (j == i)
+        std::cout << FMT(yel) << lits[j] << FMT(rst) << " ";
+      else
+        std::cout << lits[j] << " ";
+    }
+    std::cout << std::endl;
+  }
+}
+
+int result(bool isMatch) {
+  if (isMatch) {
     DEBUG_INFO("the result is verified! ");
     return 0;
-  }else{
+  } else {
     std::cout << FMT(red, [result]) << " mismatch" << std::endl;
     return 2;
   }
@@ -90,78 +127,83 @@ int main(int argc, const char **argv) {
     return 1;
   }
 
-
   std::string isSatOption = argv[1];
   std::string cnfFileName = argv[2];
   std::string satFileName = argv[3];
 
-
   bool isSat = false;
-  if(isSatOption == "-U" ){
+  if (isSatOption == "-U") {
     DEBUG_INFO("expecting unsat");
     isSat = false;
-  }else if(isSatOption == "-S"){
+  } else if (isSatOption == "-S") {
     DEBUG_INFO("expecting sat");
     isSat = true;
-  }else{
-    std::cout << FMT(red, [ERROR]) << " unexpected option " << isSatOption << std::endl;
+  } else {
+    std::cout << FMT(red, [ERROR]) << " unexpected option " << isSatOption
+              << std::endl;
     printUsage();
     return 1;
   }
 
   std::ifstream satFile(satFileName);
-  if(!satFile.is_open()){
-    std::cout << FMT(red, [ERROR]) << " failed to open input sat file: " << strerror(errno) << std::endl;
+  if (!satFile.is_open()) {
+    std::cout << FMT(red, [ERROR])
+              << " failed to open input sat file: " << strerror(errno)
+              << std::endl;
     return 1;
   }
 
   std::string statusLine;
   std::getline(satFile >> std::ws, statusLine);
-  std::transform(statusLine.begin(), statusLine.end(), statusLine.begin(), ::tolower);
+  std::transform(statusLine.begin(), statusLine.end(), statusLine.begin(),
+                 ::tolower);
   // Skip the leading label (for status line, the label is s)
-  if(statusLine.find("s ") == 0){
+  if (statusLine.find("s ") == 0) {
     statusLine = statusLine.substr(2, statusLine.size() - 2);
   }
-  if(statusLine.find("sat") == 0){
+  if (statusLine.find("sat") == 0) {
     DEBUG_INFO("result says SAT");
-    if(isSat == false){
+    if (isSat == false) {
       return result(false);
     }
-  }else if(statusLine.find("unsat") == 0){
+  } else if (statusLine.find("unsat") == 0) {
     DEBUG_INFO("result says UNSAT");
-    if(isSat == true){
+    if (isSat == true) {
       return result(false);
-    }else{
+    } else {
       satFile.close();
       return result(true);
     }
-  }else{
-    std::cout << FMT(red, [ERROR]) << " cannot parse result file header" << std::endl;
+  } else {
+    std::cout << FMT(red, [ERROR]) << " cannot parse result file header"
+              << std::endl;
     return 1;
   }
 
-  std::vector<bool> table;
+  std::vector<int> table;
   satFile >> std::ws;
   // Skip the leading label (for assignment line, this label is v)
-  if(!isdigit(satFile.peek())){
+  if (!isdigit(satFile.peek())) {
     char label;
     satFile >> label;
   }
-  while(!satFile.eof()){
+  while (!satFile.eof()) {
     int assign = 0;
     satFile >> assign;
-    if(assign == 0){
+    if (assign == 0) {
       break;
     }
-    if(static_cast<size_t>(abs(assign)) >= table.size())
-      table.resize(abs(assign) + 1);
-    table[abs(assign) - 1] = assign > 0;
+    if (static_cast<size_t>(abs(assign)) >= table.size())
+      table.resize(abs(assign) * 2, 0);
+    table[abs(assign) - 1] = assign > 0 ? 1 : -1;
   }
   satFile.close();
 
   std::ifstream cnfFile(cnfFileName);
-  if(!cnfFile.is_open()){
-    std::cout << FMT(red, [ERROR]) << " failed to open input cnf file: " << strerror(errno) << std::endl;
+  if (!cnfFile.is_open()) {
+    std::cout << FMT(red, [ERROR])
+              << " failed to open input cnf file: " << strerror(errno)
+              << std::endl;
     return 1;
   }
 
@@ -178,6 +220,46 @@ int main(int argc, const char **argv) {
       cnfFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
       continue;
     default:
+#ifdef PARSE_EXT_COMPAT
+      if (cnfLabel == '-' || cnfLabel == '+' ||
+          (cnfLabel >= '0' && cnfLabel <= '9')) {
+        // Parse Data Section
+        int number;
+        bool unsat = true, outofindex = false, clsResult = true;
+        std::vector<int> status;
+        std::vector<int> lits;
+        while (!cnfFile.eof()) {
+          cnfFile >> number;
+          if (number == 0) {
+            if (unsat)
+              printErrorClause(lits, status), clsResult = false;
+            if (outofindex)
+              printOutOfIndexErrorClause(lits, status);
+            unsat = true, outofindex = false;
+            lits.clear(), status.clear();
+          } else {
+            lits.push_back(number);
+            if (static_cast<size_t>(abs(number)) > table.size() || !table[abs(number) - 1]) {
+              status.push_back(2);
+              clsResult = false, outofindex = true;
+            } else if (number * table[abs(number) - 1] < 0) {
+              status.push_back(1);
+            } else {
+              status.push_back(0);
+              unsat = false;
+            }
+          }
+          cnfFile >> std::ws;
+        }
+        if (lits.size() > 0) {
+          if (unsat)
+            printErrorClause(lits, status), clsResult = false;
+          if (outofindex)
+            printOutOfIndexErrorClause(lits, status);
+        }
+        return result(clsResult);
+      }
+#else
       std::getline(cnfFile >> std::ws, cnfLine);
       {
         std::istringstream str(cnfLine);
@@ -187,14 +269,13 @@ int main(int argc, const char **argv) {
           str >> number;
           if (number == 0)
             break;
-          if(static_cast<size_t>(abs(number)) > table.size()){
-            std::cout << FMT(red, [ERROR]) << " result hasn't cover all of the literials" << std::endl;
+          if (static_cast<size_t>(abs(number)) > table.size()) {
+            std::cout << FMT(red, [ERROR])
+                      << " result hasn't cover all of the literials"
+                      << std::endl;
             return result(false);
           }
-          if(number > 0 && table[number - 1]){
-            isLineSat = true;
-            break;
-          }else if(number < 0 && !table[-number - 1]){
+          if (number * table[abs(number) - 1] > 0) {
             isLineSat = true;
             break;
           }
@@ -202,11 +283,14 @@ int main(int argc, const char **argv) {
           if (str.eof())
             break;
         }
-        if(!isLineSat){
-            std::cout << FMT(red, [ERROR]) << " the assignement in result cannot satisfy clause : " << FMT(yel) << cnfLine << FMT(rst) << std::endl;
-        return result(false);
+        if (!isLineSat) {
+          std::cout << FMT(red, [ERROR])
+                    << " the assignement in result cannot satisfy clause : "
+                    << FMT(yel) << cnfLine << FMT(rst) << std::endl;
+          return result(false);
         }
       }
+#endif
     }
   }
 
