@@ -22,19 +22,19 @@ EXENAME=yasat
 DIRVERIFIER=verifier
 BINVERIFIER=$(DIRVERIFIER)/yasat-veri
 
-# Compiliance Option
+# Compiling Option
 # set to any non-blank value to toggle these option
 FLAGS_DEBUG=
 FLAGS_COLOR=1
 FLAGS_VERBOSE=
 
-# Debugging flags
+# Common basic flags
 FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
           -std=c++11
 ifneq ("$(FLAGS_DEBUG)","")
-	FLAGS := $(FLAGS) -DDEBUG -ggdb3
+	FLAGS := $(FLAGS) -DDEBUG -ggdb3 # Debug flags
 else
-	FLAGS := $(FLAGS) -O2 -O3
+	FLAGS := $(FLAGS) -O2 -O3				 # Release flags
 endif
 ifneq ("$(FLAGS_COLOR)","")
 	FLAGS := $(FLAGS) -DDEBUG_COLOR
@@ -42,8 +42,6 @@ endif
 ifneq ("$(FLAGS_VERBOSE)","")
 	FLAGS := $(FLAGS) -DDEBUG_VERBOSE
 endif
-# Optimizing flags
-# FLAGS=-Wall -Wold-style-cast -Wformat=2 -ansi -pedantic -O3
 
 # List all the .o files you need to build here
 HEADER_R:= util.h
