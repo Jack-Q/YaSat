@@ -1,6 +1,4 @@
-
-YaSat -- Yet Another SAT solver
-===============================
+# YaSat -- Yet Another SAT solver
 
 > YaSat is yet another SAT solver.
 
@@ -20,65 +18,71 @@ of boolean decision, under certain constraints, a well implemented SAT solver
 can tackle a larger set of practical problem. Currently, SAT solver is the
 core component of EDA as well as lots of other applications.
 
-This Implementation
--------------------
+## This Implementation
 
 Currently, this implementation is merely a naive one with limited capability to
 solve problems with less than 20 variables and 50 clauses.  For some larger
-problem, the bottle neck is the inefficient memory usage. 
+problem, the bottle neck is the inefficient memory usage.
 
-Road map
--------
+## Road map
 
 The procedure of this implementation is conforming the following stages:
 
-- [x] Naive implementation constructing solver framework
-- [x] Novice implementation with heuristic branching (simple)
-- [x] Boolean constraints propagation feature (DPLL)
-- [x] 2-literal watching
-- [ ] Conflict driven clause learning (1UIP)
-- [ ] Non-chronological backtracking
-- [ ] Effective preprocessing
-- [ ] Random restart
-- [ ] Parallel
-- [ ] Optimize memory usage
+-   [x] Naive implementation constructing solver framework
+-   [x] Novice implementation with heuristic branching (simple)
+-   [x] Boolean constraints propagation feature (DPLL)
+-   [x] 2-literal watching
+-   [ ] Conflict driven clause learning (1UIP)
+-   [ ] Non-chronological backtracking
+-   [ ] Effective preprocessing
+-   [ ] Random restart
+-   [ ] Parallel
+-   [ ] Optimize memory usage
 
-Currently, this project arrives its milestone 1, at which simple SAT problem can be solved with DPLL and 2-literal watching features. In the following milestone 2, the following tasks are planed:
+Currently, this project arrives its milestone 1, at which simple SAT problem
+can be solved with DPLL and 2-literal watching features. In the following milestone 2,
+the following tasks are planed:
 
-- [ ] 1UIP based conflict driven clause leraning 
-- [ ] non-chronological backtracking
-- [ ] random restart
-- [ ] rewrite message and debug log utility
-- [ ] add more options for command line interface
-- [ ] add statistics during problem solving
+-   [ ] 1UIP based conflict driven clause learning
+-   [ ] non-chronological backtracking
+-   [ ] random restart
+-   [ ] rewrite message and debug log utility
+-   [ ] add more options for command line interface
+-   [ ] add statistics during problem solving
 
-Usage
------
-### Compile ###
+## Usage
+
+### Compile
 
 ```bash
-# cd to the projec directory before compiling
+# cd to the project directory before compiling
 
-# take defualt configuration
+# take default configuration
 make
 
 # set the option to non-empty value to enable these options
 make FLAGS_DEBUG=1 FLAGS_COLOR=1 FLAGS_VERBOSE=
 
-# test the program with diffenent set of SAT problem
+# test the program with different set of SAT problem
 make test-sanity
 make test-tiny
 make test-crafted  # this cannot finish currently
-# use both the sanity and tiny problem
+make test-m2-simple
+make test-m2-hard  # this cannot finish currently
+
+# use the sanity, tiny and m2-simple problems
 make test
+# use all m2 problems
+make test-m2
 ```
 
 Options:
-* Debug mode (`FLAGS_DEBUG`)
-* Color output (`FLAGS_COLOR`) 
-* Verbose message (`FLAGS_VERBOSE`) 
 
-### Execution ###
+-   Debug mode (`FLAGS_DEBUG`)
+-   Color output (`FLAGS_COLOR`)
+-   Verbose message (`FLAGS_VERBOSE`)
+
+### Execution
 
 ```bash
 # specify the input file and output file
@@ -88,8 +92,8 @@ Options:
 ./yasat --help
 ```
 
-Verifier
---------
+## Verifier
+
 In addition to the solver, this project also contains a handy utility to verify
 whether the solution given by the solver is valid. Since most satisfiable SAT
 have no limit to only one solution, and the order of literal in the solution has
@@ -97,9 +101,9 @@ no matter on the correctness of the solution, the general `diff` tools may be
 inadequate for verifying the output of the solver. Thus, the verifier in this
 project is implemented based on simple checking. This can be found in [verifier](./verifier/) folder
 
-Resource
---------
-* [CNFgen on GitHub](https://github.com/MassimoLauria/cnfgen):
-  a python toolkit to generate CNF by encoding some kinds of NP problem with specific parameter
-* [SAT Competition benchmarks](http://baldur.iti.kit.edu/sat-competition-2016/index.php?cat=downloads):
-  benchmark for the SAT Competition
+## Resource
+
+-   [CNFgen on GitHub](https://github.com/MassimoLauria/cnfgen):
+    a python toolkit to generate CNF by encoding some kinds of NP problem with specific parameter
+-   [SAT Competition benchmarks](http://baldur.iti.kit.edu/sat-competition-2016/index.php?cat=downloads):
+    benchmark for the SAT Competition
