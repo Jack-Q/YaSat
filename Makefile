@@ -27,6 +27,7 @@ BINVERIFIER=$(DIRVERIFIER)/yasat-veri
 FLAGS_DEBUG=
 FLAGS_COLOR=1
 FLAGS_VERBOSE=
+FLAGS_PARSE_EXT_COMPAT=1
 
 # Common basic flags
 FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
@@ -41,6 +42,9 @@ ifneq ("$(FLAGS_COLOR)","")
 endif
 ifneq ("$(FLAGS_VERBOSE)","")
 	FLAGS := $(FLAGS) -DDEBUG_VERBOSE
+endif
+ifneq ("$(FLAGS_PARSE_EXT_COMPAT)", "")
+	FLAGS := $(FLAGS) -DPARSE_EXT_COMPAT
 endif
 
 # List all the .o files you need to build here

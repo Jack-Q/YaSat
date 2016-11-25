@@ -2,7 +2,7 @@
 
 namespace yasat {
 void Parser::parse(istream &src, vector<Clause> &cls) {
-  string s;
+  string s, temp;
   char c;
   while (true) {
     src >> std::ws;
@@ -11,23 +11,51 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
     c = src.peek();
     switch (c) {
     case 'c':
-      src.ignore();
-      std::getline(src >> std::ws, s);
-      cout << s << endl;
+      std::getline(src >> c, s);
+      cout << fmt::message << "[COMMENT]" << fmt::reset << s << endl;
       continue;
     case 'p':
-      src.ignore();
-      src >> s >> header_lits >> header_lines;
-      src.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      std::getline(src >> c, s);
+      {
+        std::istringstream iss(s);
+        iss >> temp >> header_lits >> header_lines;
+      }
       continue;
     default:
+#ifdef PARSE_EXT_COMPAT
+      if (c == '-' || c == '+' || (c >= '0' && c <= '9')) {
+        // Data Section
+        int number;
+        Clause curClause = Clause();
+        vector<Literal> &lits = curClause.getList();
+        while (!src.eof()) {
+          src >> number;
+          if (number == 0) {
+            if (lits.size() > 0) {
+              cls.push_back(curClause);
+              clause_lines++;
+            }
+            lits.clear();
+            continue;
+          }
+          lits.push_back(Literal(number));
+          if (abs(number) > maxLiteral)
+            maxLiteral = number;
+          src >> std::ws;
+        }
+        if (lits.size() > 0) {
+          cls.push_back(curClause);
+          clause_lines++;
+        }
+      }
+#else
       std::getline(src >> std::ws, s);
       Clause curClause = parseClause(s);
-      if (curClause.getLiteralCount() > 0){
+      if (curClause.getLiteralCount() > 0) {
         cls.push_back(curClause);
         clause_lines++;
       }
-
+#endif
     }
   }
 
