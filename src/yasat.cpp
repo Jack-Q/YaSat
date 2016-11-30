@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include "parser.h"
 #include "solver.h"
 #include "writer.h"
@@ -108,7 +110,13 @@ void YaSat::loadClause() {
   maxLiteral = parser.getMaxLiteral();
 }
 
+void signal_handler_SIGINT(int){
+  cout << endl << fmt::errorLabel << "Terminated by user" << endl;
+  throw Exception("Terminated");
+}
+
 void YaSat::solve() {
+  auto old_handler = signal(SIGINT, &signal_handler_SIGINT);
   Solver solver(clauses, maxLiteral, message());
 
   solver.prep();
@@ -118,6 +126,7 @@ void YaSat::solve() {
   message() << fmt::messageLabel << "Clauses after soling step:" << endl;
   printClauses(message(), clauses);
   solver.getSolution(solution);
+  signal(SIGINT, old_handler);
 }
 
 void YaSat::printResult() {
