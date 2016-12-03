@@ -487,10 +487,8 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
              j++) {
           auto &meta = literalMetaList[j->getVal() - 1];
           if (meta.assignmet.isAssigned() && meta.assignmetStatus->isDecision())
-            msg << *j << meta.assignmetStatus->getAssignmentLevel() << endl,
-                backtrackingLevel =
-                    max(backtrackingLevel,
-                        meta.assignmetStatus->getAssignmentLevel());
+            backtrackingLevel = max(backtrackingLevel,
+                                    meta.assignmetStatus->getAssignmentLevel());
         }
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
 
