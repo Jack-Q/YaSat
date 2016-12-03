@@ -475,6 +475,34 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           addClauseToLiteralList(*clauseWatching, false);
         }
         clauseWatchingList.push_back(move(clauseWatching));
+
+        // Find the level that is approprate to be jumped to
+        int backtrackingLevel = 0;
+        for (auto j = conflictLiterals.begin(); j < conflictLiterals.end();
+             j++) {
+          auto &meta = literalMetaList[j->getVal() - 1];
+          if (meta.assignmet.isAssigned() && meta.assignmetStatus->isDecision())
+            msg << *j << meta.assignmetStatus->getAssignmentLevel() << endl,
+            backtrackingLevel = max(backtrackingLevel,
+                                    meta.assignmetStatus->getAssignmentLevel());
+        }
+        msg << fmt::messageLabel << "curent level: " << assignmentLevel
+            << " the level to be backtracked: " << backtrackingLevel << endl;
+        if (backtrackingLevel == 0) {
+          break;
+        }
+
+        while (!literalAssignmentList.empty()) {
+          LiteralAssignment &lastAssignment = literalAssignmentList.back();
+          if (lastAssignment.getAssignmentLevel() == backtrackingLevel) {
+            // target level
+            assignmentLevel = backtrackingLevel;
+            pendingUniqueClauseWatching.push(&*clauseWatchingList.back());
+            return;
+          } else {
+            deleteLastAssignment();
+          }
+        }
         break;
       } else {
         msg << fmt::messageLabel << "implcant count: " << implicantCount
@@ -497,6 +525,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         return;
       } else {
         deleteLastAssignment();
+        assignmentLevel--;
       }
     } else {
       deleteLastAssignment();

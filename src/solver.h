@@ -176,18 +176,3 @@ private:
 }
 
 #endif
-
-/*
-5,10,4,8,7,6
-[MESSAGE] To be resolved: 2 4 5
-[MESSAGE] implcant count: 0
-[MESSAGE] Current learnt: 2 5 7 8 9 10
-[MESSAGE] To be resolved: 5 9 10
-[MESSAGE] implcant count: 2
-[MESSAGE] Current learnt: 2 5 7 8 9
-[MESSAGE] To be resolved: 2 5 9
-[MESSAGE] implcant count: 0
-4 6 -10 , 4 -6 9 => 4 9 -10 (2)
-4 9 -10 , -2 -4 -5 => -2 -5 9 -10 (2)
--2 -5 9 -10, -5 9 10 => -2 -5 9 (1)
-*/
