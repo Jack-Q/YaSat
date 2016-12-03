@@ -423,7 +423,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
     for (auto i = antecedent->getList().begin(), j = conflictLiterals.begin();
          i < antecedent->getList().end(); i++) {
       while (j < conflictLiterals.end() && j->getVal() < i->getVal()) {
-        if (literalMetaList.at(j->getVal() - 1).assignmet.isAssigned())
+        if (isAssignedAtCurrentLevel(*j))
           implicantCount++;
         j++;
       }
@@ -448,13 +448,11 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
       // Find First UIP
       msg << fmt::messageLabel
           << "Conflict Clause to be added: " << conflictClause << endl;
-    }else{
+    } else {
       msg << fmt::messageLabel << "implcant count: " << implicantCount << endl;
     }
     // reset literal to unassigned state
-    lastAssignment.getLiteralMeta().assignmet =
-        Bool::Bool::getUnsignedValue();
-    literalAssignmentList.pop_back();
+    deleteLastAssignment();
   }
 
   while (!literalAssignmentList.empty()) {
@@ -470,14 +468,10 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
         return;
       } else {
-        lastAssignment.getLiteralMeta().assignmet = Bool::getUnsignedValue();
-        literalAssignmentList.pop_back();
+        deleteLastAssignment();
       }
     } else {
-
-      lastAssignment.getLiteralMeta().assignmet =
-          Bool::Bool::getUnsignedValue();
-      literalAssignmentList.pop_back();
+      deleteLastAssignment();
     }
   }
   unsatisfiable = true;

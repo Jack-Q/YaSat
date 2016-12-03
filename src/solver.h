@@ -6,6 +6,7 @@
 namespace yasat {
 
 class ClauseWatching;
+class LiteralAssignment;
 
 class LiteralMeta {
 public:
@@ -13,6 +14,7 @@ public:
 
   int listValue;
   Bool assignmet;
+  LiteralAssignment *assignmetStatus = nullptr;
 
   // static weight, occrence time in clause less then 10 variable
   int weight;
@@ -60,18 +62,18 @@ public:
   LiteralAssignment(LiteralMeta &litMeta, int level, Clause *ant)
       : LiteralAssignment(litMeta, level, LITERIAL_ASSIGN_IMPLICATION, ant) {}
 
-  LiteralAssignment(LiteralMeta &litMeta,
-                    int level,
+  LiteralAssignment(LiteralMeta &litMeta, int level,
                     int type = LITERIAL_ASSIGN_IMPLICATION,
                     Clause *antecedent = nullptr)
-      : type(type), firstAssign(true), litM(litMeta), antecedent(antecedent), assignmentLevel(level) {}
+      : type(type), firstAssign(true), litM(litMeta), antecedent(antecedent),
+        assignmentLevel(level) {}
 
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
   inline bool isFirstAssign() const { return firstAssign; }
   inline void nextAssign() { firstAssign = false; }
-  inline LiteralMeta &getLiteralMeta() const{ return litM; }
-  inline Clause *getAntecedent() const {return antecedent; }
-  inline int getAssignmentLevel() const {return assignmentLevel;}
+  inline LiteralMeta &getLiteralMeta() const { return litM; }
+  inline Clause *getAntecedent() const { return antecedent; }
+  inline int getAssignmentLevel() const { return assignmentLevel; }
 
 private:
   const int type;
@@ -126,15 +128,24 @@ private:
 
   // Stack for assignment history
   vector<LiteralAssignment> literalAssignmentList;
-  inline LiteralAssignment& newImplication(LiteralMeta &litM, Clause &clause){
-    literalAssignmentList.push_back(LiteralAssignment(litM, assignmentLevel, &clause));
+  inline LiteralAssignment &newImplication(LiteralMeta &litM, Clause &clause) {
+    literalAssignmentList.push_back(
+        LiteralAssignment(litM, assignmentLevel, &clause));
+    litM.assignmetStatus = &literalAssignmentList.back();
     return literalAssignmentList.back();
   }
-  inline LiteralAssignment& newDecision(LiteralMeta &litM){
-    literalAssignmentList.push_back(LiteralAssignment(litM, ++assignmentLevel, LiteralAssignment::LITERIAL_ASSIGN_DECISION));
+  inline LiteralAssignment &newDecision(LiteralMeta &litM) {
+    literalAssignmentList.push_back(LiteralAssignment(
+        litM, ++assignmentLevel, LiteralAssignment::LITERIAL_ASSIGN_DECISION));
+    litM.assignmetStatus = &literalAssignmentList.back();
     return literalAssignmentList.back();
   }
-
+  inline void deleteLastAssignment() {
+    auto& meta = literalAssignmentList.back().getLiteralMeta();
+    meta.assignmet = Bool::Bool::getUnsignedValue();
+    meta.assignmetStatus = nullptr;
+    literalAssignmentList.pop_back();
+  }
 
   // utility functinos
   Bool clauseLiteralStatus(Clause &clause, int index) const;
@@ -151,7 +162,13 @@ private:
 
   void printClauseWatchingList();
 
-  ClauseWatching* updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
+  ClauseWatching *updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
+
+  inline bool isAssignedAtCurrentLevel(Literal &lit) const {
+    auto meta = literalMetaList.at(lit.getVal() - 1);
+    return meta.assignmet.isAssigned() &&
+           (meta.assignmetStatus->getAssignmentLevel() == assignmentLevel);
+  }
 
   void rollbackAfterConflict(Clause *antecedent);
 };
