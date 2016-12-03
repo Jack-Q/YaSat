@@ -65,7 +65,7 @@ void Solver::solve() {
     if (!rollback) {
       // handle initial BCP
       while (!pendingUniqueClauseWatching.empty()) {
-        // Pick unhandled clause
+        // Pick unhandled' clause
         ClauseWatching *watching = pendingUniqueClauseWatching.front();
         pendingUniqueClauseWatching.pop();
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -95,7 +95,7 @@ void Solver::solve() {
 
         Literal &lit = watching->clause[watching->firstWatching];
         LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
-        literalAssignmentList.push_back(LiteralAssignment(litM));
+        literalAssignmentList.push_back(LiteralAssignment(litM, &watching->clause));
 
         if (lit.isPositive()) {
 // Perform possible assignment

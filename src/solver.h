@@ -56,27 +56,34 @@ class LiteralAssignment {
 public:
   static const int LITERIAL_ASSIGN_DECISION = 1;
   static const int LITERIAL_ASSIGN_IMPLICATION = 0;
+
+  LiteralAssignment(LiteralMeta &litMeta, Clause *ant)
+      : LiteralAssignment(litMeta, LITERIAL_ASSIGN_IMPLICATION, ant) {}
+
   LiteralAssignment(LiteralMeta &litMeta,
-                     int type = LITERIAL_ASSIGN_IMPLICATION)
-      : type(type), firstAssign(true), litM(litMeta) {}
+                    int type = LITERIAL_ASSIGN_IMPLICATION,
+                    Clause *antecedent = nullptr)
+      : type(type), firstAssign(true), litM(litMeta), antecedent(antecedent) {}
 
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
   inline bool isFirstAssign() const { return firstAssign; }
-  void nextAssign() { firstAssign = false; }
-  LiteralMeta &getLiteralMeta() { return litM; }
+  inline void nextAssign() { firstAssign = false; }
+  inline LiteralMeta &getLiteralMeta() const{ return litM; }
+  inline Clause *getAntecedent() const {return antecedent; }
 
 private:
   int type;
   // Each decision assignment ought to have two possible decisions to try
   bool firstAssign;
   LiteralMeta &litM;
+  Clause *antecedent;
 };
 
 class Solver {
 public:
   Solver(vector<unique_ptr<Clause>> &cls, int maxLit, ostream &message)
-      : msg(message), maxLiteral(maxLit), clauses(cls),
-        literalMetaList(maxLit), literalMetaPtrOrderList(maxLit) {
+      : msg(message), maxLiteral(maxLit), clauses(cls), literalMetaList(maxLit),
+        literalMetaPtrOrderList(maxLit) {
     int i = 1;
     for (auto litm = literalMetaList.begin(); litm != literalMetaList.end();
          litm++) {

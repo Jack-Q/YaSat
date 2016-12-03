@@ -24,7 +24,7 @@ BINVERIFIER=$(DIRVERIFIER)/yasat-veri
 
 # Compiling Option
 # set to any non-blank value to toggle these option
-FLAGS_DEBUG=
+FLAGS_DEBUG=1
 FLAGS_COLOR=1
 FLAGS_VERBOSE=1
 FLAGS_PARSE_EXT_COMPAT=1
