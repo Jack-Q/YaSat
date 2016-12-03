@@ -9,7 +9,7 @@ namespace yasat {
 
 inline void printTitle(ostream &out);
 inline void printHelp(ostream &out);
-inline void printClauses(ostream &out, vector<Clause> &clauses);
+inline void printClauses(ostream &out, vector<unique_ptr<Clause>> &clauses);
 
 YaSat::YaSat()
     : state(0), inputDataSource(nullptr), outputResult(nullptr),
@@ -158,10 +158,10 @@ inline void printHelp(ostream &out) {
       << endl;
 }
 
-inline void printClauses(ostream &out, vector<Clause> &clauses) {
+inline void printClauses(ostream &out, vector<unique_ptr<Clause>> &clauses) {
   int limit = 50;
-  for (auto cls = clauses.begin(); cls != clauses.end() && --limit; cls++){
-    out << *cls << endl;
+  for (auto cls = clauses.begin(); cls < clauses.end() && --limit; cls++){
+    out << **cls << endl;
   }
   if(limit == 0) out << fmt::message << "   ..." << fmt::reset << endl;
 }

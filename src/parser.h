@@ -9,7 +9,7 @@ class Parser {
 public:
   Parser(ostream &message) : msg(message) { reset(); }
 
-  void parse(istream &src, vector<Clause> &cls);
+  void parse(istream &src, vector<unique_ptr<Clause>> &cls);
   void reset() { header_lits = header_lines = clause_lines = maxLiteral = 0; }
 
   inline int getMaxLiteral() const { return maxLiteral; }
@@ -20,7 +20,7 @@ private:
   int clause_lines;
   int maxLiteral;
 
-  Clause parseClause(string &s);
+  void parseClause(Clause &, string &s);
   ostream &msg;
 };
 }

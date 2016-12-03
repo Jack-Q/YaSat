@@ -1,12 +1,12 @@
 #ifndef SOLVER_HEADER
 #define SOLVER_HEADER
-
 #include "clause.h"
 #include "util.h"
 
 namespace yasat {
 
 class ClauseWatching;
+
 class LiteralMeta {
 public:
   LiteralMeta() : weight(0), weightPositive(0), weightNegative(0) {}
@@ -74,10 +74,9 @@ private:
 
 class Solver {
 public:
-  Solver(vector<Clause> &cls, int maxLit, ostream &message)
+  Solver(vector<unique_ptr<Clause>> &cls, int maxLit, ostream &message)
       : msg(message), maxLiteral(maxLit), clauses(cls),
         literalMetaList(maxLit), literalMetaPtrOrderList(maxLit) {
-    clauseWatchingList.reserve(cls.size() * 2);
     int i = 1;
     for (auto litm = literalMetaList.begin(); litm != literalMetaList.end();
          litm++) {
@@ -100,8 +99,8 @@ private:
   bool unsatisfiable = false;
 
   // Clause list
-  vector<Clause> &clauses;
-  vector<ClauseWatching> clauseWatchingList;
+  vector<unique_ptr<Clause>> &clauses;
+  vector<unique_ptr<ClauseWatching>> clauseWatchingList;
 
   void addClauseToLiteralList(ClauseWatching &watching, int isFirst);
 

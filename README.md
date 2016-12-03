@@ -38,6 +38,8 @@ The procedure of this implementation is conforming the following stages:
 -   [ ] Random restart
 -   [ ] Parallel
 -   [ ] Optimize memory usage
+-   [ ] Equivalent variable substitution
+-   [ ] Burst of random variable ordering (at initial parse)
 
 Currently, this project arrives its milestone 1, at which simple SAT problem
 can be solved with DPLL and 2-literal watching features. In the following milestone 2,
@@ -107,3 +109,6 @@ project is implemented based on simple checking. This can be found in [verifier]
     a python toolkit to generate CNF by encoding some kinds of NP problem with specific parameter
 -   [SAT Competition benchmarks](http://baldur.iti.kit.edu/sat-competition-2016/index.php?cat=downloads):
     benchmark for the SAT Competition
+
+## Reference
+-  [[MiniSat] An extensible SAT-Solver](http://minisat.se/downloads/MiniSat.pdf)

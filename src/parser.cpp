@@ -1,7 +1,7 @@
 #include "parser.h"
 
 namespace yasat {
-void Parser::parse(istream &src, vector<Clause> &cls) {
+void Parser::parse(istream &src, vector<unique_ptr<Clause>> &cls) {
   string s, temp;
   char c;
   while (true) {
@@ -26,13 +26,13 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
       if (c == '-' || c == '+' || (c >= '0' && c <= '9')) {
         // Data Section
         int number;
-        Clause curClause = Clause();
+        Clause curClause;
         vector<Literal> &lits = curClause.getList();
         while (!src.eof()) {
           src >> number;
           if (number == 0) {
             if (lits.size() > 0) {
-              cls.push_back(curClause);
+              cls.push_back(make_unique<Clause>(curClause));
               clause_lines++;
             }
             lits.clear();
@@ -44,15 +44,16 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
           src >> std::ws;
         }
         if (lits.size() > 0) {
-          cls.push_back(curClause);
+          cls.push_back(make_unique<Clause>(curClause));
           clause_lines++;
         }
       }
 #else
       std::getline(src >> std::ws, s);
-      Clause curClause = parseClause(s);
-      if (curClause.getLiteralCount() > 0) {
-        cls.push_back(curClause);
+      unique_ptr<Clause> clsPtr = make_unique<Clause>();
+      parseClause(*clsPtr, s);
+      if (clsPtr->getLiteralCount() > 0) {
+        cls.push_back(move(clsPtr));
         clause_lines++;
       }
 #endif
@@ -78,8 +79,7 @@ void Parser::parse(istream &src, vector<Clause> &cls) {
   }
 }
 
-Clause Parser::parseClause(string &s) {
-  Clause cls = Clause();
+void Parser::parseClause(Clause &cls, string &s) {
   vector<Literal> &lits = cls.getList();
   std::istringstream str(s);
 
@@ -104,6 +104,5 @@ Clause Parser::parseClause(string &s) {
     cout << fmt::warningLabel << "Literals after 0 in a CNF line is ignored"
          << endl;
 
-  return cls;
 }
 }

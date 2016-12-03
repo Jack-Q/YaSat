@@ -7,7 +7,8 @@ namespace yasat {
 void Solver::prep() {
   // int maxLit;
 
-  for (auto clause = clauses.begin(); clause != clauses.end(); clause++) {
+  for (auto clauseItr = clauses.begin(); clauseItr != clauses.end(); clauseItr++) {
+    Clause *clause = clauseItr->get();
     sort(clause->getList().begin(), clause->getList().end(),
          Literal::comparatorValue);
 
@@ -30,8 +31,8 @@ void Solver::prep() {
     }
 
     // Setup two literal watching
-    clauseWatchingList.push_back(ClauseWatching(*clause));
-    ClauseWatching &watching = clauseWatchingList.back();
+    clauseWatchingList.push_back(make_unique<ClauseWatching>(*clause));
+    ClauseWatching &watching = *clauseWatchingList.back();
 
     watching.firstWatching = 0;
     addClauseToLiteralList(watching, true);
@@ -309,7 +310,7 @@ void Solver::printClauseWatchingList() {
   int limit = 100;
   for (auto i = clauseWatchingList.begin();
        i < clauseWatchingList.end() && limit--; i++) {
-    msg << "      " << *i << endl;
+    msg << "      " << **i << endl;
   }
   if (!++limit)
     msg << " ..." << endl;

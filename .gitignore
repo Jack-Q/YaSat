@@ -16,6 +16,7 @@
 
 # Bin File
 yasat
+minisat
 
 # Prerequisites
 *.d
