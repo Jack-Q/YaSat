@@ -430,8 +430,10 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
       // Implication
       antecedent = lastAssignment.getAntecedent();
       implicantCount = 0;
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
       msg << fmt::messageLabel << "Current learnt: " << conflictClause << endl;
       msg << fmt::messageLabel << "To be resolved: " << *antecedent << endl;
+#endif
 
       // Resolve literal list
       for (auto i = antecedent->getList().begin(), j = conflictLiterals.begin();
@@ -460,10 +462,13 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           implicantCount++, i = j - conflictLiterals.begin();
 
       if (implicantCount == 1) {
-        // Find First UIP
+// Find First UIP
+//
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
         msg << fmt::messageLabel
             << "Found 1UIP, conflict will to be added: " << conflictClause
             << endl;
+#endif
         leartClauses.push_back(make_unique<Clause>(conflictClause));
         unique_ptr<ClauseWatching> clauseWatching =
             make_unique<ClauseWatching>(*leartClauses.back());
@@ -483,11 +488,15 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           auto &meta = literalMetaList[j->getVal() - 1];
           if (meta.assignmet.isAssigned() && meta.assignmetStatus->isDecision())
             msg << *j << meta.assignmetStatus->getAssignmentLevel() << endl,
-            backtrackingLevel = max(backtrackingLevel,
-                                    meta.assignmetStatus->getAssignmentLevel());
+                backtrackingLevel =
+                    max(backtrackingLevel,
+                        meta.assignmetStatus->getAssignmentLevel());
         }
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+
         msg << fmt::messageLabel << "curent level: " << assignmentLevel
             << " the level to be backtracked: " << backtrackingLevel << endl;
+#endif
         if (backtrackingLevel == 0) {
           break;
         }
@@ -505,8 +514,11 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
         break;
       } else {
+
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
         msg << fmt::messageLabel << "implcant count: " << implicantCount
             << endl;
+#endif
       }
     }
   }
