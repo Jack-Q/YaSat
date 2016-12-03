@@ -423,6 +423,9 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
       }
     }
 
+    // reset literal to unassigned state
+    deleteLastAssignment();
+
     if (containsImplication) {
       // Implication
       antecedent = lastAssignment.getAntecedent();
@@ -450,23 +453,34 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
       }
 
-      // count implcation literial count 
-      for(auto j = conflictLiterals.begin(); j < conflictLiterals.end(); j++)
+      // count implcation literial count
+      int i = 0;
+      for (auto j = conflictLiterals.begin(); j < conflictLiterals.end(); j++)
         if (isAssignedAtCurrentLevel(*j))
-          implicantCount++;
+          implicantCount++, i = j - conflictLiterals.begin();
 
       if (implicantCount == 1) {
         // Find First UIP
         msg << fmt::messageLabel
-            << "Conflict Clause to be added: " << conflictClause << endl;
+            << "Found 1UIP, conflict will to be added: " << conflictClause
+            << endl;
+        leartClauses.push_back(make_unique<Clause>(conflictClause));
+        unique_ptr<ClauseWatching> clauseWatching =
+            make_unique<ClauseWatching>(*leartClauses.back());
+        clauseWatching->firstWatching = i;
+        addClauseToLiteralList(*clauseWatching, true);
+        if (conflictLiterals.size() > 1) {
+          clauseWatching->secondWatching =
+              i == 0 ? 1 : 0; // TODO: add more heuristic selection
+          addClauseToLiteralList(*clauseWatching, false);
+        }
+        clauseWatchingList.push_back(move(clauseWatching));
+        break;
       } else {
         msg << fmt::messageLabel << "implcant count: " << implicantCount
             << endl;
       }
     }
-
-    // reset literal to unassigned state
-    deleteLastAssignment();
   }
 
   while (!literalAssignmentList.empty()) {

@@ -113,6 +113,7 @@ private:
 
   // Clause list
   vector<unique_ptr<Clause>> &clauses;
+  vector<unique_ptr<Clause>> leartClauses;
   vector<unique_ptr<ClauseWatching>> clauseWatchingList;
 
   void addClauseToLiteralList(ClauseWatching &watching, int isFirst);
