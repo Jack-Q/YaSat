@@ -7,7 +7,8 @@ namespace yasat {
 void Solver::prep() {
   // int maxLit;
 
-  for (auto clauseItr = clauses.begin(); clauseItr != clauses.end(); clauseItr++) {
+  for (auto clauseItr = clauses.begin(); clauseItr != clauses.end();
+       clauseItr++) {
     Clause *clause = clauseItr->get();
     sort(clause->getList().begin(), clause->getList().end(),
          Literal::comparatorValue);
@@ -86,7 +87,7 @@ void Solver::solve() {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
             msg << fmt::messageLabel << "conflict" << endl;
 #endif
-            rollbackAfterConflict();
+            rollbackAfterConflict(&watching->clause);
             break;
           }
         }
@@ -95,7 +96,8 @@ void Solver::solve() {
 
         Literal &lit = watching->clause[watching->firstWatching];
         LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
-        literalAssignmentList.push_back(LiteralAssignment(litM, &watching->clause));
+        literalAssignmentList.push_back(
+            LiteralAssignment(litM, &watching->clause));
 
         if (lit.isPositive()) {
 // Perform possible assignment
@@ -104,8 +106,10 @@ void Solver::solve() {
               << fmt::reset << ": " << litM.listValue << " -> "
               << Bool::getTrueValue() << endl;
 #endif
-          if (updateWatchingLiteral(litM, Bool::getTrueValue()) < 0) {
-            rollbackAfterConflict();
+          ClauseWatching *conflict =
+              updateWatchingLiteral(litM, Bool::getTrueValue());
+          if (conflict != nullptr) {
+            rollbackAfterConflict(&conflict->clause);
           }
         } else {
 // Perform negative assignment
@@ -114,8 +118,11 @@ void Solver::solve() {
               << fmt::reset << ": " << litM.listValue << " -> "
               << Bool::getFalseValue() << endl;
 #endif
-          if (updateWatchingLiteral(litM, Bool::getFalseValue()) < 0) {
-            rollbackAfterConflict();
+
+          ClauseWatching *conflict =
+              updateWatchingLiteral(litM, Bool::getFalseValue());
+          if (conflict != nullptr) {
+            rollbackAfterConflict(&conflict->clause);
           }
         }
       }
@@ -139,8 +146,10 @@ void Solver::solve() {
               << fmt::reset << ": " << nxt->listValue << " -> "
               << Bool::getFalseValue() << endl;
 #endif
-          if (updateWatchingLiteral(*nxt, Bool::getFalseValue()) < 0) {
-            rollbackAfterConflict();
+          ClauseWatching *conflict =
+              updateWatchingLiteral(*nxt, Bool::getFalseValue());
+          if (conflict != nullptr) {
+            rollbackAfterConflict(&conflict->clause);
             break;
           }
         } else {
@@ -149,8 +158,10 @@ void Solver::solve() {
               << fmt::reset << ": " << nxt->listValue << " -> "
               << Bool::getTrueValue() << endl;
 #endif
-          if (updateWatchingLiteral(*nxt, Bool::getTrueValue()) < 0) {
-            rollbackAfterConflict();
+          ClauseWatching *conflict =
+              updateWatchingLiteral(*nxt, Bool::getTrueValue());
+          if (conflict != nullptr) {
+            rollbackAfterConflict(&conflict->clause);
             break;
           }
         }
@@ -171,8 +182,10 @@ void Solver::solve() {
           << "decision" << fmt::reset << ": " << litM.listValue << " -> "
           << litM.assignmet << endl;
 #endif
-      if (updateWatchingLiteral(litM, litM.assignmet) < 0)
-        rollbackAfterConflict();
+      ClauseWatching *conflict =
+          updateWatchingLiteral(litM, litM.assignmet);
+      if (conflict != nullptr)
+        rollbackAfterConflict(&conflict->clause);
     }
   }
 }
@@ -184,7 +197,7 @@ void Solver::getSolution(vector<Literal> &sol) {
   for (auto litm = literalMetaList.begin(); litm != literalMetaList.end();
        litm++) {
     sol.push_back(Literal(litm->listValue, litm->assignmet.getValue(),
-                           Bool::BOOL_UNASSIGN));
+                          Bool::BOOL_UNASSIGN));
   }
 }
 
@@ -209,7 +222,7 @@ void Solver::addClauseToLiteralList(ClauseWatching &watching, int isFirst) {
 }
 
 void Solver::removeClauseFromLiteralList(ClauseWatching &watching,
-                                          int isFirst) {
+                                         int isFirst) {
   Literal &lit =
       watching
           .clause[isFirst ? watching.firstWatching : watching.secondWatching];
@@ -249,7 +262,7 @@ Bool Solver::clauseLiteralStatus(Clause &clause, int index) const {
 }
 
 Bool Solver::watchingLiteralStatus(ClauseWatching &watching,
-                                    bool isFirst) const {
+                                   bool isFirst) const {
   int watchingIndex =
       isFirst ? watching.firstWatching : watching.secondWatching;
   if (watchingIndex == -1) {
@@ -289,8 +302,8 @@ void Solver::printLiteralMetaList() {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
   msg << fmt::messageLabel << "LitMeta: ";
   int limit = 100;
-  for (auto i = literalMetaList.begin();
-       i != literalMetaList.end() && limit--; i++) {
+  for (auto i = literalMetaList.begin(); i != literalMetaList.end() && limit--;
+       i++) {
     msg << (i->assignmet.isAssigned()
                 ? i->assignmet.isTrue() ? fmt::message : fmt::negative
                 : fmt::positive)
@@ -317,7 +330,8 @@ void Solver::printClauseWatchingList() {
 #endif
 }
 
-int Solver::updateWatchingLiteral(LiteralMeta &litM, Bool assignValue) {
+ClauseWatching *Solver::updateWatchingLiteral(LiteralMeta &litM,
+                                              Bool assignValue) {
   litM.assignmet = assignValue;
   auto &clauseUpdateList =
       assignValue.isTrue() ? litM.negativeList : litM.positiveList;
@@ -350,9 +364,9 @@ int Solver::updateWatchingLiteral(LiteralMeta &litM, Bool assignValue) {
         msg << fmt::messageLabel << fmt::error << "find conflict" << fmt::reset
             << endl;
         msg << fmt::messageLabel << "conflict @ " << *curWat << endl;
-#endif
         printLiteralMetaList();
-        return -1;
+#endif
+        return curWat;
       }
       if (!result.isAssigned()) {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -382,14 +396,16 @@ int Solver::updateWatchingLiteral(LiteralMeta &litM, Bool assignValue) {
       addClauseToLiteralList(*curWat, 1);
     }
   }
-  return 0;
+  return nullptr;
 }
 
-void Solver::rollbackAfterConflict() {
+void Solver::rollbackAfterConflict(Clause *antecedent) {
   rollback = true;
+
   // Clear pending unique clause
   while (!pendingUniqueClauseWatching.empty())
     pendingUniqueClauseWatching.pop();
+    
   while (!literalAssignmentList.empty()) {
     LiteralAssignment &lastAssignment = literalAssignmentList.back();
     if (lastAssignment.isDecision()) {

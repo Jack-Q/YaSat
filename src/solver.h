@@ -138,9 +138,9 @@ private:
 
   void printClauseWatchingList();
 
-  int updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
+  ClauseWatching* updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
 
-  void rollbackAfterConflict();
+  void rollbackAfterConflict(Clause *antecedent);
 };
 }
 
