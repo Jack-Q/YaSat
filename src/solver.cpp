@@ -415,42 +415,56 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
     if (lastAssignment.isDecision())
       break;
 
-    // Implication
-    antecedent = lastAssignment.getAntecedent();
-    implicantCount = 0;
-    msg << fmt::messageLabel << "Current learnt: " << conflictClause << endl;
-    msg << fmt::messageLabel << "To be resolved: " << *antecedent << endl;
-    for (auto i = antecedent->getList().begin(), j = conflictLiterals.begin();
-         i < antecedent->getList().end(); i++) {
-      while (j < conflictLiterals.end() && j->getVal() < i->getVal()) {
-        if (isAssignedAtCurrentLevel(*j))
-          implicantCount++;
-        j++;
-      }
-      if (i->getVal() == j->getVal()) {
-        if (i->isPositive() == j->isPositive()) {
-          // Same literal, ignore
-        } else {
-          // Conflict literal pair, eliminate
-          j = conflictLiterals.erase(j);
-          implicantCount--;
-        }
-      } else {
-        // new literal
-        if (literalMetaList.at(i->getVal() - 1).assignmet.isAssigned())
-          implicantCount++;
-        j = conflictLiterals.insert(j, *i);
-        j++;
+    bool containsImplication = false;
+    for (auto i = conflictLiterals.begin(); i < conflictLiterals.end(); i++) {
+      if (i->getVal() == lastAssignment.getLiteralMeta().listValue) {
+        containsImplication = true;
+        break;
       }
     }
 
-    if (implicantCount == 1) {
-      // Find First UIP
-      msg << fmt::messageLabel
-          << "Conflict Clause to be added: " << conflictClause << endl;
-    } else {
-      msg << fmt::messageLabel << "implcant count: " << implicantCount << endl;
+    if (containsImplication) {
+      // Implication
+      antecedent = lastAssignment.getAntecedent();
+      implicantCount = 0;
+      msg << fmt::messageLabel << "Current learnt: " << conflictClause << endl;
+      msg << fmt::messageLabel << "To be resolved: " << *antecedent << endl;
+
+      // Resolve literal list
+      for (auto i = antecedent->getList().begin(), j = conflictLiterals.begin();
+           i < antecedent->getList().end(); i++) {
+        while (j < conflictLiterals.end() && j->getVal() < i->getVal()) {
+          j++;
+        }
+        if (i->getVal() == j->getVal()) {
+          if (i->isPositive() == j->isPositive()) {
+            // Same literal, ignore
+          } else {
+            // Conflict literal pair, eliminate
+            j = conflictLiterals.erase(j);
+          }
+        } else {
+          // new literal
+          j = conflictLiterals.insert(j, *i);
+          j++;
+        }
+      }
+
+      // count implcation literial count 
+      for(auto j = conflictLiterals.begin(); j < conflictLiterals.end(); j++)
+        if (isAssignedAtCurrentLevel(*j))
+          implicantCount++;
+
+      if (implicantCount == 1) {
+        // Find First UIP
+        msg << fmt::messageLabel
+            << "Conflict Clause to be added: " << conflictClause << endl;
+      } else {
+        msg << fmt::messageLabel << "implcant count: " << implicantCount
+            << endl;
+      }
     }
+
     // reset literal to unassigned state
     deleteLastAssignment();
   }

@@ -165,7 +165,7 @@ private:
   ClauseWatching *updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
 
   inline bool isAssignedAtCurrentLevel(Literal &lit) const {
-    auto meta = literalMetaList.at(lit.getVal() - 1);
+    auto& meta = literalMetaList.at(lit.getVal() - 1);
     return meta.assignmet.isAssigned() &&
            (meta.assignmetStatus->getAssignmentLevel() == assignmentLevel);
   }
