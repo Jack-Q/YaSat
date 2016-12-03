@@ -174,7 +174,7 @@ void Solver::solve() {
         return;
       }
       rollback = false;
-      LiteralMeta &litM = literalAssignmentList.back().getLiteralMeta();
+      LiteralMeta &litM = literalAssignmentList.back()->getLiteralMeta();
 
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
       msg << fmt::messageLabel << "Rollback, make another " << fmt::error
@@ -411,7 +411,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
 
   // process at current decision level
   while (!literalAssignmentList.empty()) {
-    LiteralAssignment &lastAssignment = literalAssignmentList.back();
+    LiteralAssignment &lastAssignment = *literalAssignmentList.back();
     if (lastAssignment.isDecision())
       break;
 
@@ -493,7 +493,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
 
         while (!literalAssignmentList.empty()) {
-          LiteralAssignment &lastAssignment = literalAssignmentList.back();
+          LiteralAssignment &lastAssignment = *literalAssignmentList.back();
           if (lastAssignment.getAssignmentLevel() == backtrackingLevel) {
             // target level
             assignmentLevel = backtrackingLevel;
@@ -512,7 +512,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
   }
 
   while (!literalAssignmentList.empty()) {
-    LiteralAssignment &lastAssignment = literalAssignmentList.back();
+    LiteralAssignment &lastAssignment = *literalAssignmentList.back();
     if (lastAssignment.isDecision()) {
       // Decision
       if (lastAssignment.isFirstAssign()) {

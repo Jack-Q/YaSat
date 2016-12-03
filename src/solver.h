@@ -63,7 +63,7 @@ public:
       : LiteralAssignment(litMeta, level, LITERIAL_ASSIGN_IMPLICATION, ant) {}
 
   LiteralAssignment(LiteralMeta &litMeta, int level,
-                    int type = LITERIAL_ASSIGN_IMPLICATION,
+                    int type = LITERIAL_ASSIGN_DECISION,
                     Clause *antecedent = nullptr)
       : type(type), firstAssign(true), litM(litMeta), antecedent(antecedent),
         assignmentLevel(level) {}
@@ -128,21 +128,21 @@ private:
   queue<ClauseWatching *> pendingUniqueClauseWatching;
 
   // Stack for assignment history
-  vector<LiteralAssignment> literalAssignmentList;
+  vector<unique_ptr<LiteralAssignment>> literalAssignmentList;
   inline LiteralAssignment &newImplication(LiteralMeta &litM, Clause &clause) {
     literalAssignmentList.push_back(
-        LiteralAssignment(litM, assignmentLevel, &clause));
-    litM.assignmetStatus = &literalAssignmentList.back();
-    return literalAssignmentList.back();
+        make_unique<LiteralAssignment>(litM, assignmentLevel, &clause));
+    litM.assignmetStatus = literalAssignmentList.back().get();
+    return *literalAssignmentList.back();
   }
   inline LiteralAssignment &newDecision(LiteralMeta &litM) {
-    literalAssignmentList.push_back(LiteralAssignment(
-        litM, ++assignmentLevel, LiteralAssignment::LITERIAL_ASSIGN_DECISION));
-    litM.assignmetStatus = &literalAssignmentList.back();
-    return literalAssignmentList.back();
+    literalAssignmentList.push_back(make_unique<LiteralAssignment>(
+        litM, ++assignmentLevel));
+    litM.assignmetStatus = literalAssignmentList.back().get();
+    return *literalAssignmentList.back();
   }
   inline void deleteLastAssignment() {
-    auto& meta = literalAssignmentList.back().getLiteralMeta();
+    auto &meta = literalAssignmentList.back()->getLiteralMeta();
     meta.assignmet = Bool::Bool::getUnsignedValue();
     meta.assignmetStatus = nullptr;
     literalAssignmentList.pop_back();
@@ -166,7 +166,7 @@ private:
   ClauseWatching *updateWatchingLiteral(LiteralMeta &litM, Bool assignValue);
 
   inline bool isAssignedAtCurrentLevel(Literal &lit) const {
-    auto& meta = literalMetaList.at(lit.getVal() - 1);
+    auto &meta = literalMetaList.at(lit.getVal() - 1);
     return meta.assignmet.isAssigned() &&
            (meta.assignmetStatus->getAssignmentLevel() == assignmentLevel);
   }
