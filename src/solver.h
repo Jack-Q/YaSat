@@ -57,26 +57,29 @@ public:
   static const int LITERIAL_ASSIGN_DECISION = 1;
   static const int LITERIAL_ASSIGN_IMPLICATION = 0;
 
-  LiteralAssignment(LiteralMeta &litMeta, Clause *ant)
-      : LiteralAssignment(litMeta, LITERIAL_ASSIGN_IMPLICATION, ant) {}
+  LiteralAssignment(LiteralMeta &litMeta, int level, Clause *ant)
+      : LiteralAssignment(litMeta, level, LITERIAL_ASSIGN_IMPLICATION, ant) {}
 
   LiteralAssignment(LiteralMeta &litMeta,
+                    int level,
                     int type = LITERIAL_ASSIGN_IMPLICATION,
                     Clause *antecedent = nullptr)
-      : type(type), firstAssign(true), litM(litMeta), antecedent(antecedent) {}
+      : type(type), firstAssign(true), litM(litMeta), antecedent(antecedent), assignmentLevel(level) {}
 
   inline bool isDecision() const { return type == LITERIAL_ASSIGN_DECISION; }
   inline bool isFirstAssign() const { return firstAssign; }
   inline void nextAssign() { firstAssign = false; }
   inline LiteralMeta &getLiteralMeta() const{ return litM; }
   inline Clause *getAntecedent() const {return antecedent; }
+  inline int getAssignmentLevel() const {return assignmentLevel;}
 
 private:
-  int type;
+  const int type;
   // Each decision assignment ought to have two possible decisions to try
   bool firstAssign;
   LiteralMeta &litM;
   Clause *antecedent;
+  const int assignmentLevel;
 };
 
 class Solver {
@@ -102,6 +105,7 @@ private:
   ostream &msg;
 
   int maxLiteral;
+  int assignmentLevel = 0;
   bool rollback = false;
   bool unsatisfiable = false;
 
@@ -122,6 +126,15 @@ private:
 
   // Stack for assignment history
   vector<LiteralAssignment> literalAssignmentList;
+  inline LiteralAssignment& newImplication(LiteralMeta &litM, Clause &clause){
+    literalAssignmentList.push_back(LiteralAssignment(litM, assignmentLevel, &clause));
+    return literalAssignmentList.back();
+  }
+  inline LiteralAssignment& newDecision(LiteralMeta &litM){
+    literalAssignmentList.push_back(LiteralAssignment(litM, ++assignmentLevel, LiteralAssignment::LITERIAL_ASSIGN_DECISION));
+    return literalAssignmentList.back();
+  }
+
 
   // utility functinos
   Bool clauseLiteralStatus(Clause &clause, int index) const;
@@ -145,3 +158,18 @@ private:
 }
 
 #endif
+
+/*
+5,10,4,8,7,6
+[MESSAGE] To be resolved: 2 4 5
+[MESSAGE] implcant count: 0
+[MESSAGE] Current learnt: 2 5 7 8 9 10
+[MESSAGE] To be resolved: 5 9 10
+[MESSAGE] implcant count: 2
+[MESSAGE] Current learnt: 2 5 7 8 9
+[MESSAGE] To be resolved: 2 5 9
+[MESSAGE] implcant count: 0
+4 6 -10 , 4 -6 9 => 4 9 -10 (2)
+4 9 -10 , -2 -4 -5 => -2 -5 9 -10 (2)
+-2 -5 9 -10, -5 9 10 => -2 -5 9 (1)
+*/

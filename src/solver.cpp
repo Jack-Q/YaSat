@@ -96,8 +96,7 @@ void Solver::solve() {
 
         Literal &lit = watching->clause[watching->firstWatching];
         LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
-        literalAssignmentList.push_back(
-            LiteralAssignment(litM, &watching->clause));
+        newImplication(litM, watching->clause);
 
         if (lit.isPositive()) {
 // Perform possible assignment
@@ -138,8 +137,8 @@ void Solver::solve() {
         auto nxt = *nxtPtr;
         if (nxt->assignmet.isAssigned())
           continue;
-        literalAssignmentList.push_back(LiteralAssignment(
-            *nxt, LiteralAssignment::LITERIAL_ASSIGN_DECISION));
+        newDecision(*nxt);
+
         if (nxt->weightPositive > nxt->weightNegative) {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
           msg << fmt::messageLabel << "Make " << fmt::error << "decision"
@@ -182,8 +181,7 @@ void Solver::solve() {
           << "decision" << fmt::reset << ": " << litM.listValue << " -> "
           << litM.assignmet << endl;
 #endif
-      ClauseWatching *conflict =
-          updateWatchingLiteral(litM, litM.assignmet);
+      ClauseWatching *conflict = updateWatchingLiteral(litM, litM.assignmet);
       if (conflict != nullptr)
         rollbackAfterConflict(&conflict->clause);
     }
@@ -405,7 +403,60 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
   // Clear pending unique clause
   while (!pendingUniqueClauseWatching.empty())
     pendingUniqueClauseWatching.pop();
-    
+
+  Clause conflictClause;
+  int implicantCount;
+  vector<Literal> &conflictLiterals = conflictClause.getList();
+  conflictLiterals = antecedent->getList();
+
+  // process at current decision level
+  while (!literalAssignmentList.empty()) {
+    LiteralAssignment &lastAssignment = literalAssignmentList.back();
+    if (lastAssignment.isDecision())
+      break;
+
+    // Implication
+    antecedent = lastAssignment.getAntecedent();
+    implicantCount = 0;
+    msg << fmt::messageLabel << "Current learnt: " << conflictClause << endl;
+    msg << fmt::messageLabel << "To be resolved: " << *antecedent << endl;
+    for (auto i = antecedent->getList().begin(), j = conflictLiterals.begin();
+         i < antecedent->getList().end(); i++) {
+      while (j < conflictLiterals.end() && j->getVal() < i->getVal()) {
+        if (literalMetaList.at(j->getVal() - 1).assignmet.isAssigned())
+          implicantCount++;
+        j++;
+      }
+      if (i->getVal() == j->getVal()) {
+        if (i->isPositive() == j->isPositive()) {
+          // Same literal, ignore
+        } else {
+          // Conflict literal pair, eliminate
+          j = conflictLiterals.erase(j);
+          implicantCount--;
+        }
+      } else {
+        // new literal
+        if (literalMetaList.at(i->getVal() - 1).assignmet.isAssigned())
+          implicantCount++;
+        j = conflictLiterals.insert(j, *i);
+        j++;
+      }
+    }
+
+    if (implicantCount == 1) {
+      // Find First UIP
+      msg << fmt::messageLabel
+          << "Conflict Clause to be added: " << conflictClause << endl;
+    }else{
+      msg << fmt::messageLabel << "implcant count: " << implicantCount << endl;
+    }
+    // reset literal to unassigned state
+    lastAssignment.getLiteralMeta().assignmet =
+        Bool::Bool::getUnsignedValue();
+    literalAssignmentList.pop_back();
+  }
+
   while (!literalAssignmentList.empty()) {
     LiteralAssignment &lastAssignment = literalAssignmentList.back();
     if (lastAssignment.isDecision()) {
@@ -423,7 +474,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         literalAssignmentList.pop_back();
       }
     } else {
-      // Implication
+
       lastAssignment.getLiteralMeta().assignmet =
           Bool::Bool::getUnsignedValue();
       literalAssignmentList.pop_back();
