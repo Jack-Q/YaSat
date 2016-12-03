@@ -84,7 +84,7 @@ void Solver::solve() {
             continue;
           } else {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
-            msg << fmt::messageLabel << "confilct" << endl;
+            msg << fmt::messageLabel << "conflict" << endl;
 #endif
             rollbackAfterConflict();
             break;
