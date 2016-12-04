@@ -462,6 +462,26 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           implicantCount++, i = j - conflictLiterals.begin();
 
       if (implicantCount == 1) {
+
+        // Find the level that is approprate to be jumped to
+        int backtrackingLevel = -1;
+        for (auto j = conflictLiterals.begin(); j < conflictLiterals.end();
+             j++) {
+          auto &meta = literalMetaList[j->getVal() - 1];
+          if (meta.assignmet.isAssigned() &&
+              meta.assignmetStatus->getAssignmentLevel() != assignmentLevel)
+            backtrackingLevel = max(backtrackingLevel,
+                                    meta.assignmetStatus->getAssignmentLevel());
+        }
+
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+        msg << fmt::messageLabel << "curent level: " << assignmentLevel
+            << " the level to be backtracked: " << backtrackingLevel << endl;
+#endif
+        if (backtrackingLevel == -1) {
+          break;
+        }
+
 // Find First UIP
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
         msg << fmt::messageLabel
@@ -480,31 +500,14 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
         clauseWatchingList.push_back(move(clauseWatching));
 
-        // Find the level that is approprate to be jumped to
-        int backtrackingLevel = 0;
-        for (auto j = conflictLiterals.begin(); j < conflictLiterals.end();
-             j++) {
-          auto &meta = literalMetaList[j->getVal() - 1];
-          if (meta.assignmet.isAssigned() && meta.assignmetStatus->isDecision())
-            backtrackingLevel = max(backtrackingLevel,
-                                    meta.assignmetStatus->getAssignmentLevel());
-        }
-#if defined(DEBUG) && defined(DEBUG_VERBOSE)
-
-        msg << fmt::messageLabel << "curent level: " << assignmentLevel
-            << " the level to be backtracked: " << backtrackingLevel << endl;
-#endif
-        if (backtrackingLevel == 0) {
-          break;
-        }
-
         while (!literalAssignmentList.empty()) {
           LiteralAssignment &lastAssignment = *literalAssignmentList.back();
           if (lastAssignment.getAssignmentLevel() == backtrackingLevel) {
             // target level
             assignmentLevel = backtrackingLevel;
             pendingUniqueClauseWatching.push(&*clauseWatchingList.back());
-            rollback = false; // the nonchronological backtracking will result in a state of unfinished BCP state
+            rollback = false; // the nonchronological backtracking will result
+                              // in a state of unfinished BCP state
             return;
           } else {
             deleteLastAssignment();
