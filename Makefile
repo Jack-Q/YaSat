@@ -112,42 +112,51 @@ test-tiny: all verifier | dir-test
 	$(BINVERIFIER) -U benchmarks/tiny/rand10_50.cnf $(DIRTEST)/rand10_50.sat
 test-m2-simple: all verifier | dir-test
 	@echo "###### M2-SIMPLE TEST CASE ######"
-	@echo "TEST CASE 1: Parity 8bit (Simplified)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par8-1-c.cnf $(DIRTEST)/par8-1-c.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/par8-1-c.cnf $(DIRTEST)/par8-1-c.sat
-	@echo "TEST CASE 2: Parity 8bit"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par8-1.cnf $(DIRTEST)/par8-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/par8-1.cnf $(DIRTEST)/par8-1.sat
-	@echo "TEST CASE 3: Parity 16bit (Simplified)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat
-	@echo "TEST CASE 4: Parity 16bit"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par16-1.cnf $(DIRTEST)/par16-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/par16-1.cnf $(DIRTEST)/par16-1.sat
-	@echo "TEST CASE 5: John Hooker 1"
+	@echo "TEST CASE 1: John Hooker 1"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/jnh1.cnf $(DIRTEST)/jnh1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-simple/jnh1.cnf $(DIRTEST)/jnh1.sat
-	@echo "TEST CASE 6: John Hooker 10"
+	@echo "TEST CASE 2: John Hooker 10"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/jnh10.cnf $(DIRTEST)/jnh10.sat > /dev/null
 	$(BINVERIFIER) -U benchmarks/m2-simple/jnh10.cnf $(DIRTEST)/jnh10.sat
-	@echo "TEST CASE 7: John Hooker 11"
+	@echo "TEST CASE 3: John Hooker 11"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/jnh11.cnf $(DIRTEST)/jnh11.sat > /dev/null
 	$(BINVERIFIER) -U benchmarks/m2-simple/jnh11.cnf $(DIRTEST)/jnh11.sat
-	@echo "TEST CASE 8: Inductive Inference (8)"
+	@echo "TEST CASE 4: Inductive Inference (8)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/ii8a1.cnf $(DIRTEST)/ii8a1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-simple/ii8a1.cnf $(DIRTEST)/ii8a1.sat
-	@echo "TEST CASE 9: Dubois (20)"
+	@echo "TEST CASE 5: Dubois (20)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/dubois20.cnf $(DIRTEST)/dubois20.sat > /dev/null
 	$(BINVERIFIER) -U benchmarks/m2-simple/dubois20.cnf $(DIRTEST)/dubois20.sat
-	@echo "TEST CASE 10: Artificial Instance 50 (Satisfiabile)"
+	@echo "TEST CASE 6: Artificial Instance 50 (Satisfiabile)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-50-1_6-yes1-1.cnf $(DIRTEST)/aim-50-1_6-yes1-1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-simple/aim-50-1_6-yes1-1.cnf $(DIRTEST)/aim-50-1_6-yes1-1.sat
-	@echo "TEST CASE 11: Artificial Instance 50 (Unsatisfiabile)"
+	@echo "TEST CASE 7: Artificial Instance 50 (Unsatisfiabile)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-50-1_6-no-1.cnf $(DIRTEST)/aim-50-1_6-no-1.sat > /dev/null
 	$(BINVERIFIER) -U benchmarks/m2-simple/aim-50-1_6-no-1.cnf $(DIRTEST)/aim-50-1_6-no-1.sat
-	@echo "TEST CASE 12: Artificial Instance 100 (Satisfiabile)"
+	@echo "TEST CASE 8: Artificial Instance 100 (Satisfiabile)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-100-1_6-yes1-1.cnf $(DIRTEST)/aim-100-1_6-yes1-1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-simple/aim-100-1_6-yes1-1.cnf $(DIRTEST)/aim-100-1_6-yes1-1.sat
+	@echo "TEST CASE 9: Artificial Instance 100 (Unsatisfiabile)"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat > /dev/null
+	$(BINVERIFIER) -U benchmarks/m2-simple/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat
+	@echo "TEST CASE 10: Artificial Instance 200 (Satisfiabile)"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-200-1_6-yes1-1.cnf $(DIRTEST)/aim-200-1_6-yes1-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/aim-200-1_6-yes1-1.cnf $(DIRTEST)/aim-200-1_6-yes1-1.sat
+	@echo "TEST CASE 11: Artificial Instance 200 (Unsatisfiabile)"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat > /dev/null
+	$(BINVERIFIER) -U benchmarks/m2-simple/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat
+	@echo "TEST CASE 12: Parity 8bit (Simplified)"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par8-1-c.cnf $(DIRTEST)/par8-1-c.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/par8-1-c.cnf $(DIRTEST)/par8-1-c.sat
+	@echo "TEST CASE 13: Parity 8bit"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par8-1.cnf $(DIRTEST)/par8-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/par8-1.cnf $(DIRTEST)/par8-1.sat
+	@echo "TEST CASE 14: Parity 16bit (Simplified)"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat
+	@echo "TEST CASE 15: Parity 16bit"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par16-1.cnf $(DIRTEST)/par16-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-simple/par16-1.cnf $(DIRTEST)/par16-1.sat
 test-m2-hard: all verifier | dir-test
 	@echo "###### M2-HARD TEST CASE ######"
 	@echo "TEST CASE 1: Parity 32bit (Simplified)"
@@ -165,15 +174,6 @@ test-m2-hard: all verifier | dir-test
 	@echo "TEST CASE 5: Dubois (100)"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/dubois100.cnf $(DIRTEST)/dubois100.sat > /dev/null
 	$(BINVERIFIER) -U benchmarks/m2-hard/dubois100.cnf $(DIRTEST)/dubois100.sat
-	@echo "TEST CASE 6: Artificial Instance 100 (Unsatisfiabile)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat > /dev/null
-	$(BINVERIFIER) -U benchmarks/m2-hard/aim-100-1_6-no-1.cnf $(DIRTEST)/aim-100-1_6-no-1.sat
-	@echo "TEST CASE 7: Artificial Instance 200 (Satisfiabile)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-200-1_6-yes1-1.cnf $(DIRTEST)/aim-200-1_6-yes1-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-hard/aim-200-1_6-yes1-1.cnf $(DIRTEST)/aim-200-1_6-yes1-1.sat
-	@echo "TEST CASE 8: Artificial Instance 200 (Unsatisfiabile)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat > /dev/null
-	$(BINVERIFIER) -U benchmarks/m2-hard/aim-200-1_6-no-1.cnf $(DIRTEST)/aim-200-1_6-no-1.sat
 test-crafted: all verifier | dir-test
 	@echo "###### CRAFTED TEST CASE ######"
 	@echo "TEST CASE 1: fixed bandwidth"
