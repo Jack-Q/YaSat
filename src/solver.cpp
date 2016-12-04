@@ -441,7 +441,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         while (j < conflictLiterals.end() && j->getVal() < i->getVal()) {
           j++;
         }
-        if (i->getVal() == j->getVal()) {
+        if (j < conflictLiterals.end() && i->getVal() == j->getVal()) {
           if (i->isPositive() == j->isPositive()) {
             // Same literal, ignore
           } else {
@@ -463,7 +463,6 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
 
       if (implicantCount == 1) {
 // Find First UIP
-//
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
         msg << fmt::messageLabel
             << "Found 1UIP, conflict will to be added: " << conflictClause
@@ -505,6 +504,7 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
             // target level
             assignmentLevel = backtrackingLevel;
             pendingUniqueClauseWatching.push(&*clauseWatchingList.back());
+            rollback = false; // the nonchronological backtracking will result in a state of unfinished BCP state
             return;
           } else {
             deleteLastAssignment();
