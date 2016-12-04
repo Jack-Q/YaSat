@@ -32,8 +32,8 @@ The procedure of this implementation is conforming the following stages:
 -   [x] Novice implementation with heuristic branching (simple)
 -   [x] Boolean constraints propagation feature (DPLL)
 -   [x] 2-literal watching
--   [ ] Conflict driven clause learning (1UIP)
--   [ ] Non-chronological backtracking
+-   [x] Conflict driven clause learning (1UIP)
+-   [x] Non-chronological backtracking
 -   [ ] Effective preprocessing
 -   [ ] Random restart
 -   [ ] Parallel
@@ -45,8 +45,8 @@ Currently, this project arrives its milestone 1, at which simple SAT problem
 can be solved with DPLL and 2-literal watching features. In the following milestone 2,
 the following tasks are planed:
 
--   [ ] 1UIP based conflict driven clause learning
--   [ ] non-chronological backtracking
+-   [x] 1UIP based conflict driven clause learning
+-   [x] non-chronological backtracking
 -   [ ] random restart
 -   [ ] rewrite message and debug log utility
 -   [ ] add more options for command line interface
@@ -111,4 +111,5 @@ project is implemented based on simple checking. This can be found in [verifier]
     benchmark for the SAT Competition
 
 ## Reference
--  [[MiniSat] An extensible SAT-Solver](http://minisat.se/downloads/MiniSat.pdf)
+
+-   [\[MiniSat\] An extensible SAT-Solver](http://minisat.se/downloads/MiniSat.pdf)

@@ -23,7 +23,7 @@ to any non-blank value toggles is on, unless explicit notes.
     the output message will be formatted with color in supported terminals.
     However, when redirect the message to file for later check,
     the ANSI control sequence will be seen. In this scenario,
-    diable the option or read output file via `cat` command.
+    disable the option or read output file via `cat` command.
     Enabled by default.
 -   `FLAGS_VERBOSE`: toggle the verbose mode. When enabled, the program
     will print detailed information about the execution procedure. This can

@@ -135,7 +135,7 @@ void Solver::solve() {
       for (auto nxtPtr = literalMetaPtrOrderList.begin();
            nxtPtr < literalMetaPtrOrderList.end(); nxtPtr++) {
         auto nxt = *nxtPtr;
-        if (nxt->assignmet.isAssigned())
+        if (nxt->assignment.isAssigned())
           continue;
         newDecision(*nxt);
 
@@ -179,9 +179,9 @@ void Solver::solve() {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
       msg << fmt::messageLabel << "Rollback, make another " << fmt::error
           << "decision" << fmt::reset << ": " << litM.listValue << " -> "
-          << litM.assignmet << endl;
+          << litM.assignment << endl;
 #endif
-      ClauseWatching *conflict = updateWatchingLiteral(litM, litM.assignmet);
+      ClauseWatching *conflict = updateWatchingLiteral(litM, litM.assignment);
       if (conflict != nullptr)
         rollbackAfterConflict(&conflict->clause);
     }
@@ -194,7 +194,7 @@ void Solver::getSolution(vector<Literal> &sol) {
     return;
   for (auto litm = literalMetaList.begin(); litm != literalMetaList.end();
        litm++) {
-    sol.push_back(Literal(litm->listValue, litm->assignmet.getValue(),
+    sol.push_back(Literal(litm->listValue, litm->assignment.getValue(),
                           Bool::BOOL_UNASSIGN));
   }
 }
@@ -248,9 +248,9 @@ void Solver::removeClauseFromLiteralList(ClauseWatching &watching,
 Bool Solver::clauseLiteralStatus(Clause &clause, int index) const {
   Literal &lit = clause[index];
   const LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
-  if (litM.assignmet.isAssigned()) {
-    return ((litM.assignmet.isTrue() && lit.isPositive()) ||
-            (!litM.assignmet.isTrue() && !lit.isPositive()))
+  if (litM.assignment.isAssigned()) {
+    return ((litM.assignment.isTrue() && lit.isPositive()) ||
+            (!litM.assignment.isTrue() && !lit.isPositive()))
                ? Bool::getTrueValue()
                : Bool::getFalseValue();
   } else {
@@ -302,10 +302,10 @@ void Solver::printLiteralMetaList() {
   int limit = 100;
   for (auto i = literalMetaList.begin(); i != literalMetaList.end() && limit--;
        i++) {
-    msg << (i->assignmet.isAssigned()
-                ? i->assignmet.isTrue() ? fmt::message : fmt::negative
+    msg << (i->assignment.isAssigned()
+                ? i->assignment.isTrue() ? fmt::message : fmt::negative
                 : fmt::positive)
-        << i->listValue << ":" << i->assignmet << fmt::reset << "(" << i->weight
+        << i->listValue << ":" << i->assignment << fmt::reset << "(" << i->weight
         << ")"
         << " ";
   }
@@ -330,7 +330,7 @@ void Solver::printClauseWatchingList() {
 
 ClauseWatching *Solver::updateWatchingLiteral(LiteralMeta &litM,
                                               Bool assignValue) {
-  litM.assignmet = assignValue;
+  litM.assignment = assignValue;
   auto &clauseUpdateList =
       assignValue.isTrue() ? litM.negativeList : litM.positiveList;
   for (auto i = clauseUpdateList.begin(); i < clauseUpdateList.end();
@@ -468,10 +468,10 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         for (auto j = conflictLiterals.begin(); j < conflictLiterals.end();
              j++) {
           auto &meta = literalMetaList[j->getVal() - 1];
-          if (meta.assignmet.isAssigned() &&
-              meta.assignmetStatus->getAssignmentLevel() != assignmentLevel)
+          if (meta.assignment.isAssigned() &&
+              meta.assignmentStatus->getAssignmentLevel() != assignmentLevel)
             backtrackingLevel = max(backtrackingLevel,
-                                    meta.assignmetStatus->getAssignmentLevel());
+                                    meta.assignmentStatus->getAssignmentLevel());
         }
 
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -530,10 +530,10 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
       // Decision
       if (lastAssignment.isFirstAssign()) {
         lastAssignment.nextAssign();
-        if (lastAssignment.getLiteralMeta().assignmet.isTrue()) {
-          lastAssignment.getLiteralMeta().assignmet = Bool::getFalseValue();
+        if (lastAssignment.getLiteralMeta().assignment.isTrue()) {
+          lastAssignment.getLiteralMeta().assignment = Bool::getFalseValue();
         } else {
-          lastAssignment.getLiteralMeta().assignmet = Bool::getTrueValue();
+          lastAssignment.getLiteralMeta().assignment = Bool::getTrueValue();
         }
         return;
       } else {

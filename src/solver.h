@@ -13,8 +13,8 @@ public:
   LiteralMeta() : weight(0), weightPositive(0), weightNegative(0) {}
 
   int listValue;
-  Bool assignmet;
-  LiteralAssignment *assignmetStatus = nullptr;
+  Bool assignment;
+  LiteralAssignment *assignmentStatus = nullptr;
 
   // static weight, occrence time in clause less then 10 variable
   int weight;
@@ -132,19 +132,19 @@ private:
   inline LiteralAssignment &newImplication(LiteralMeta &litM, Clause &clause) {
     literalAssignmentList.push_back(
         make_unique<LiteralAssignment>(litM, assignmentLevel, &clause));
-    litM.assignmetStatus = literalAssignmentList.back().get();
+    litM.assignmentStatus = literalAssignmentList.back().get();
     return *literalAssignmentList.back();
   }
   inline LiteralAssignment &newDecision(LiteralMeta &litM) {
     literalAssignmentList.push_back(make_unique<LiteralAssignment>(
         litM, ++assignmentLevel));
-    litM.assignmetStatus = literalAssignmentList.back().get();
+    litM.assignmentStatus = literalAssignmentList.back().get();
     return *literalAssignmentList.back();
   }
   inline void deleteLastAssignment() {
     auto &meta = literalAssignmentList.back()->getLiteralMeta();
-    meta.assignmet = Bool::Bool::getUnsignedValue();
-    meta.assignmetStatus = nullptr;
+    meta.assignment = Bool::Bool::getUnsignedValue();
+    meta.assignmentStatus = nullptr;
     literalAssignmentList.pop_back();
   }
 
@@ -167,8 +167,8 @@ private:
 
   inline bool isAssignedAtCurrentLevel(Literal &lit) const {
     auto &meta = literalMetaList.at(lit.getVal() - 1);
-    return meta.assignmet.isAssigned() &&
-           (meta.assignmetStatus->getAssignmentLevel() == assignmentLevel);
+    return meta.assignment.isAssigned() &&
+           (meta.assignmentStatus->getAssignmentLevel() == assignmentLevel);
   }
 
   void rollbackAfterConflict(Clause *antecedent);
