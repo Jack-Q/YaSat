@@ -524,8 +524,8 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
         clauseWatchingList.push_back(move(clauseWatching));
         // Update the weight of the literal
-        if(updateLiteralWeightWithClause(&*leartClauses.back()))
-          literalMetaPtrOrderListInHeapOrder = false;
+        // if(updateLiteralWeightWithClause(&*leartClauses.back()))
+        //   literalMetaPtrOrderListInHeapOrder = false;
 
         while (!literalAssignmentList.empty()) {
           LiteralAssignment &lastAssignment = *literalAssignmentList.back();
