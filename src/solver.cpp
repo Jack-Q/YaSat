@@ -14,22 +14,7 @@ void Solver::prep() {
          Literal::comparatorValue);
 
     // Update the literal weight
-    int clauseWeight = 10 - clause->getLiteralCount();
-    if (clauseWeight > 0) {
-      for (auto lit = clause->getList().begin(); lit != clause->getList().end();
-           lit++) {
-        literalMetaList.at(lit->getVal() - 1).weight += clauseWeight;
-        if (lit->isPositive()) {
-          literalMetaList.at(lit->getVal() - 1).weightPositive += clauseWeight;
-          // literalMetaList.at(lit->getVal() - 1)
-          //     .positiveList.push_back(&*clause);
-        } else {
-          literalMetaList.at(lit->getVal() - 1).weightNegative += clauseWeight;
-          // literalMetaList.at(lit->getVal() - 1)
-          //     .negativeList.push_back(&*clause);
-        }
-      }
-    }
+    updateLiteralWeightWithClause(clause);
 
     // Setup two literal watching
     clauseWatchingList.push_back(make_unique<ClauseWatching>(*clause));
@@ -51,10 +36,6 @@ void Solver::prep() {
   for (size_t i = 0; i < literalMetaList.size(); i++) {
     literalMetaPtrOrderList[i] = &literalMetaList[i];
   }
-  sort(literalMetaPtrOrderList.begin(), literalMetaPtrOrderList.end(),
-       [](LiteralMeta *lit1, LiteralMeta *lit2) {
-         return lit1->weight > lit2->weight;
-       });
 
   printLiteralMetaList();
   printClauseWatchingList();
@@ -62,6 +43,8 @@ void Solver::prep() {
 
 void Solver::solve() {
   while (true) {
+    literalWeightDecay();
+
     printLiteralMetaList();
     if (!rollback) {
       // handle initial BCP
@@ -94,6 +77,8 @@ void Solver::solve() {
         if (result_1.isAssigned())
           watching->swapWatchingIndex();
 
+        // update statistical data
+        statis_implication++;
         Literal &lit = watching->clause[watching->firstWatching];
         LiteralMeta &litM = literalMetaList[lit.getVal() - 1];
         newImplication(litM, watching->clause);
@@ -131,44 +116,72 @@ void Solver::solve() {
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
       msg << fmt::messageLabel << "Make decision" << endl;
 #endif
-      bool assign = false;
-      for (auto nxtPtr = literalMetaPtrOrderList.begin();
-           nxtPtr < literalMetaPtrOrderList.end(); nxtPtr++) {
-        auto nxt = *nxtPtr;
-        if (nxt->assignment.isAssigned())
-          continue;
-        newDecision(*nxt);
 
-        if (nxt->weightPositive > nxt->weightNegative) {
-#if defined(DEBUG) && defined(DEBUG_VERBOSE)
-          msg << fmt::messageLabel << "Make " << fmt::error << "decision"
-              << fmt::reset << ": " << nxt->listValue << " -> "
-              << Bool::getFalseValue() << endl;
-#endif
-          ClauseWatching *conflict =
-              updateWatchingLiteral(*nxt, Bool::getFalseValue());
-          if (conflict != nullptr) {
-            rollbackAfterConflict(&conflict->clause);
-            break;
-          }
-        } else {
-#if defined(DEBUG) && defined(DEBUG_VERBOSE)
-          msg << fmt::messageLabel << "Make " << fmt::error << "decision"
-              << fmt::reset << ": " << nxt->listValue << " -> "
-              << Bool::getTrueValue() << endl;
-#endif
-          ClauseWatching *conflict =
-              updateWatchingLiteral(*nxt, Bool::getTrueValue());
-          if (conflict != nullptr) {
-            rollbackAfterConflict(&conflict->clause);
-            break;
-          }
-        }
-        assign = true;
-        break;
+      if(!literalMetaPtrOrderListInHeapOrder)
+        std::make_heap(literalMetaPtrOrderList.begin(), literalMetaPtrOrderList.end(),
+               literalCompartor), literalMetaPtrOrderListInHeapOrder = true;
+      while (!literalMetaPtrOrderList.empty() &&
+             literalMetaPtrOrderList.front()->assignmentStatus) {
+
+        // move the top literal to initial position
+        std::pop_heap(literalMetaPtrOrderList.begin(),
+                      literalMetaPtrOrderList.end(), literalCompartor);
+        literalMetaPtrOrderList.pop_back();
       }
-      if (!rollback && !assign)
-        return;
+
+      if (literalMetaPtrOrderList.empty()) {
+// No unassigned literal, found the result
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+        msg << fmt::messageLabel << "Literal Meta List Empty" << endl;
+#endif
+        if (!rollback)
+          return;
+        else
+          continue;
+      }
+
+      // move the top literal to initial position
+      std::pop_heap(literalMetaPtrOrderList.begin(),
+                    literalMetaPtrOrderList.end(), literalCompartor);
+      auto nxt = literalMetaPtrOrderList.back();
+      literalMetaPtrOrderList.pop_back();
+
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+      msg << fmt::messageLabel << fmt::error << "Pop" << fmt::reset
+          << " literal " << nxt->listValue << " from list" << endl;
+#endif
+
+      // Update statistical data for decsion count
+      statis_decision++;
+      newDecision(*nxt);
+
+      if (nxt->weightPositive > nxt->weightNegative) {
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+        msg << fmt::messageLabel << "Make " << fmt::error << "decision"
+            << fmt::reset << ": " << nxt->listValue << " -> "
+            << Bool::getFalseValue() << endl;
+#endif
+        ClauseWatching *conflict =
+            updateWatchingLiteral(*nxt, Bool::getFalseValue());
+        if (conflict != nullptr) {
+          rollbackAfterConflict(&conflict->clause);
+        }
+      } else {
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+        msg << fmt::messageLabel << "Make " << fmt::error << "decision"
+            << fmt::reset << ": " << nxt->listValue << " -> "
+            << Bool::getTrueValue() << endl;
+#endif
+        ClauseWatching *conflict =
+            updateWatchingLiteral(*nxt, Bool::getTrueValue());
+        if (conflict != nullptr) {
+          rollbackAfterConflict(&conflict->clause);
+        }
+      }
+
+      // if (!rollback)
+      //   return;
+
     } else {
       if (unsatisfiable) {
         return;
@@ -198,6 +211,12 @@ void Solver::getSolution(vector<Literal> &sol) {
                           Bool::BOOL_UNASSIGN));
   }
 }
+
+const std::function<bool(LiteralMeta const *, LiteralMeta const *)>
+    Solver::literalCompartor =
+        [](LiteralMeta const *lit1, LiteralMeta const *lit2) -> bool {
+  return lit1->weight > lit2->weight;
+};
 
 void Solver::addClauseToLiteralList(ClauseWatching &watching, int isFirst) {
   Literal &lit =
@@ -305,8 +324,8 @@ void Solver::printLiteralMetaList() {
     msg << (i->assignment.isAssigned()
                 ? i->assignment.isTrue() ? fmt::message : fmt::negative
                 : fmt::positive)
-        << i->listValue << ":" << i->assignment << fmt::reset << "(" << i->weight
-        << ")"
+        << i->listValue << ":" << i->assignment << fmt::reset << "("
+        << i->weight << ")"
         << " ";
   }
   if (!++limit)
@@ -398,6 +417,9 @@ ClauseWatching *Solver::updateWatchingLiteral(LiteralMeta &litM,
 }
 
 void Solver::rollbackAfterConflict(Clause *antecedent) {
+  // Update statistical data
+  statis_conflict++;
+
   rollback = true;
 
   // Clear pending unique clause
@@ -470,8 +492,8 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           auto &meta = literalMetaList[j->getVal() - 1];
           if (meta.assignment.isAssigned() &&
               meta.assignmentStatus->getAssignmentLevel() != assignmentLevel)
-            backtrackingLevel = max(backtrackingLevel,
-                                    meta.assignmentStatus->getAssignmentLevel());
+            backtrackingLevel = max(
+                backtrackingLevel, meta.assignmentStatus->getAssignmentLevel());
         }
 
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
@@ -488,7 +510,9 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
             << "Found 1UIP, conflict will to be added: " << conflictClause
             << endl;
 #endif
+        // Push new clause to learnt list
         leartClauses.push_back(make_unique<Clause>(conflictClause));
+        // Create and add clause watching service
         unique_ptr<ClauseWatching> clauseWatching =
             make_unique<ClauseWatching>(*leartClauses.back());
         clauseWatching->firstWatching = i;
@@ -499,6 +523,9 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           addClauseToLiteralList(*clauseWatching, false);
         }
         clauseWatchingList.push_back(move(clauseWatching));
+        // Update the weight of the literal
+        if(updateLiteralWeightWithClause(&*leartClauses.back()))
+          literalMetaPtrOrderListInHeapOrder = false;
 
         while (!literalAssignmentList.empty()) {
           LiteralAssignment &lastAssignment = *literalAssignmentList.back();
@@ -547,4 +574,5 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
   unsatisfiable = true;
   return;
 }
+
 }

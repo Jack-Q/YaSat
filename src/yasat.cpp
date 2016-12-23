@@ -112,7 +112,7 @@ void YaSat::loadClause() {
 
 void signal_handler_SIGINT(int){
   cout << endl << fmt::errorLabel << "Terminated by user" << endl;
-  throw Exception("Terminated");
+  cout << endl << fmt::errorLabel << "Program Quiting" << endl;
   exit(1);
 }
 

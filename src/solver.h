@@ -107,9 +107,19 @@ private:
   ostream &msg;
 
   int maxLiteral;
+
+  int statis_conflict = 0;
+  int statis_decision = 0;
+  int statis_implication = 0;
+  int statis_backtracklength = 0;
+
   int assignmentLevel = 0;
   bool rollback = false;
   bool unsatisfiable = false;
+
+  // Compartor for heuristical ordering
+  static const std::function<bool(LiteralMeta const *, LiteralMeta const *)>
+      literalCompartor;
 
   // Clause list
   vector<unique_ptr<Clause>> &clauses;
@@ -123,6 +133,7 @@ private:
   // Literal list (for global information)
   vector<LiteralMeta> literalMetaList;
   vector<LiteralMeta *> literalMetaPtrOrderList;
+  bool literalMetaPtrOrderListInHeapOrder = false;
 
   // Queue for unique list item
   queue<ClauseWatching *> pendingUniqueClauseWatching;
@@ -136,16 +147,27 @@ private:
     return *literalAssignmentList.back();
   }
   inline LiteralAssignment &newDecision(LiteralMeta &litM) {
-    literalAssignmentList.push_back(make_unique<LiteralAssignment>(
-        litM, ++assignmentLevel));
+    literalAssignmentList.push_back(
+        make_unique<LiteralAssignment>(litM, ++assignmentLevel));
     litM.assignmentStatus = literalAssignmentList.back().get();
     return *literalAssignmentList.back();
   }
+
+  // Delete an assignment from the list and reset to unassigned state
+  // as well as push back to the list
   inline void deleteLastAssignment() {
     auto &meta = literalAssignmentList.back()->getLiteralMeta();
     meta.assignment = Bool::Bool::getUnsignedValue();
     meta.assignmentStatus = nullptr;
     literalAssignmentList.pop_back();
+
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+    msg << fmt::messageLabel << fmt::error << "Push" << fmt::reset
+        << " unassigned literal " << meta.listValue << " into list" << endl;
+#endif
+    literalMetaPtrOrderList.push_back(&meta);
+    std::push_heap(literalMetaPtrOrderList.begin(),
+                   literalMetaPtrOrderList.end(), literalCompartor);
   }
 
   // utility functinos
@@ -172,6 +194,38 @@ private:
   }
 
   void rollbackAfterConflict(Clause *antecedent);
+
+  inline void literalWeightDecay() {
+    static int last_decay = 0;
+    if (statis_conflict % 200 == 0 && statis_conflict != last_decay){
+      msg << fmt::error << "Decay Weight @ " << statis_conflict << fmt::reset << endl;
+      last_decay = statis_conflict;
+      for (auto i = literalMetaList.begin(); i < literalMetaList.end(); i++)
+        // TODO:  decay rate ought to be set by outer setting
+        i->weight = i->weight * 4 / 3;
+    }
+  }
+
+  // Update literal weight when a new clause is added
+  // return false if all literal is untouched
+  inline bool updateLiteralWeightWithClause(Clause* clause){
+    int clauseWeight = 20 - clause->getLiteralCount();
+    if (clauseWeight <= 0) return false;
+    for (auto lit = clause->getList().begin(); lit != clause->getList().end();
+         lit++) {
+      literalMetaList.at(lit->getVal() - 1).weight += clauseWeight;
+      // if (lit->isPositive()) {
+      //   literalMetaList.at(lit->getVal() - 1).weightPositive += clauseWeight;
+      //   // literalMetaList.at(lit->getVal() - 1)
+      //   //     .positiveList.push_back(&*clause);
+      // } else {
+      //   literalMetaList.at(lit->getVal() - 1).weightNegative += clauseWeight;
+      //   // literalMetaList.at(lit->getVal() - 1)
+      //   //     .negativeList.push_back(&*clause);
+      // }
+    }
+    return true;
+  }
 };
 }
 
