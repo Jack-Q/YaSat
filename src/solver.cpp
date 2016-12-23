@@ -45,6 +45,9 @@ void Solver::solve() {
   while (true) {
     literalWeightDecay();
 
+    if(statis_decision % 3000 == 0)
+      printStatisData();
+
     printLiteralMetaList();
     if (!rollback) {
       // handle initial BCP
@@ -504,6 +507,9 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
           break;
         }
 
+        if(assignmentLevel - backtrackingLevel > statis_backtracklength)
+          statis_backtracklength = assignmentLevel - backtrackingLevel;
+
 // Find First UIP
 #if defined(DEBUG) && defined(DEBUG_VERBOSE)
         msg << fmt::messageLabel
@@ -524,8 +530,10 @@ void Solver::rollbackAfterConflict(Clause *antecedent) {
         }
         clauseWatchingList.push_back(move(clauseWatching));
         // Update the weight of the literal
-        // if(updateLiteralWeightWithClause(&*leartClauses.back()))
-        //   literalMetaPtrOrderListInHeapOrder = false;
+        #if defined(LITERAL_WEIGHT_UPDATE) 
+        if(updateLiteralWeightWithClause(&*leartClauses.back()))
+          literalMetaPtrOrderListInHeapOrder = false;
+        #endif
 
         while (!literalAssignmentList.empty()) {
           LiteralAssignment &lastAssignment = *literalAssignmentList.back();

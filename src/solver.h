@@ -194,23 +194,27 @@ private:
   }
 
   void rollbackAfterConflict(Clause *antecedent);
-
   inline void literalWeightDecay() {
+#if defined(LITERAL_WEIGHT_DECAY)
     static int last_decay = 0;
-    if (statis_conflict % 200 == 0 && statis_conflict != last_decay){
-      msg << fmt::error << "Decay Weight @ " << statis_conflict << fmt::reset << endl;
+    if (statis_conflict % 200 == 0 && statis_conflict != last_decay) {
+#if defined(DEBUG) && defined(DEBUG_VERBOSE)
+      msg << fmt::error << "Decay Weight @ " << statis_conflict << fmt::reset
+          << endl;
+#endif
       last_decay = statis_conflict;
       for (auto i = literalMetaList.begin(); i < literalMetaList.end(); i++)
         // TODO:  decay rate ought to be set by outer setting
         i->weight = i->weight * 4 / 3;
     }
+#endif
   }
-
   // Update literal weight when a new clause is added
   // return false if all literal is untouched
-  inline bool updateLiteralWeightWithClause(Clause* clause){
-    int clauseWeight = 20 - clause->getLiteralCount();
-    if (clauseWeight <= 0) return false;
+  inline bool updateLiteralWeightWithClause(Clause *clause) {
+    int clauseWeight = 15 - clause->getLiteralCount();
+    if (clauseWeight <= 0)
+      return false;
     for (auto lit = clause->getList().begin(); lit != clause->getList().end();
          lit++) {
       literalMetaList.at(lit->getVal() - 1).weight += clauseWeight;
@@ -225,6 +229,17 @@ private:
       // }
     }
     return true;
+  }
+
+  inline void printStatisData() {
+#if defined(PRINT_STATIS)
+    msg << fmt::statisLabel << "IMP: " << fmt::message << statis_implication
+        << fmt::reset << "\tDEC: " << fmt::message << statis_decision
+        << fmt::reset << "\tCON: " << fmt::message << statis_conflict
+        << fmt::reset << "\tLER: " << fmt::message << leartClauses.size()
+        << fmt::reset << "\tMAX_BACK: " << fmt::message
+        << statis_backtracklength << fmt::reset << endl;
+#endif
   }
 };
 }

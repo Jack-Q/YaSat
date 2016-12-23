@@ -41,16 +41,15 @@ The procedure of this implementation is conforming the following stages:
 -   [ ] Equivalent variable substitution
 -   [ ] Burst of random variable ordering (at initial parse)
 
-Currently, this project arrives its milestone 1, at which simple SAT problem
-can be solved with DPLL and 2-literal watching features. In the following milestone 2,
-the following tasks are planed:
+Currently, this project arrives its milestone 2. Following list shows the
+status of current implementation progress.
 
 -   [x] 1UIP based conflict driven clause learning
 -   [x] non-chronological backtracking
--   [ ] random restart
--   [ ] rewrite message and debug log utility
--   [ ] add more options for command line interface
--   [ ] add statistics during problem solving
+-   [ ] random restart (Postponed)
+-   [ ] rewrite message and debug log utility (Postponed)
+-   [x] add more options for command line interface
+-   [x] add statistics during problem solving
 
 ## Usage
 
@@ -63,7 +62,11 @@ the following tasks are planed:
 make
 
 # set the option to non-empty value to enable these options
-make FLAGS_DEBUG=1 FLAGS_COLOR=1 FLAGS_VERBOSE=
+make FLAGS_DEBUG=1 FLAGS_COLOR=1             \
+             FLAGS_VERBOSE=                  \
+             FLAGS_PRINT_STATIS=1            \
+             FLAGS_LITERAL_WEIGHT_DECAY=1    \
+             FLAGS_LITERAL_WEIGHT_UPDATE=1
 
 # test the program with different set of SAT problem
 make test-sanity
@@ -83,6 +86,9 @@ Options:
 -   Debug mode (`FLAGS_DEBUG`)
 -   Color output (`FLAGS_COLOR`)
 -   Verbose message (`FLAGS_VERBOSE`)
+-   Statistical data print (`FLAGS_PRINT_STATIS`)
+-   Literal weight decay feature (`FLAGS_LITERAL_WEIGHT_DECAY`)
+-   Literal weight update on new clause (`FLAGS_LITERAL_WEIGHT_UPDATE`)
 
 ### Execution
 

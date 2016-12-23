@@ -24,10 +24,13 @@ BINVERIFIER=$(DIRVERIFIER)/yasat-veri
 
 # Compiling Option
 # set to any non-blank value to toggle these option
-FLAGS_DEBUG=1
-FLAGS_COLOR=1
-FLAGS_VERBOSE=1
+FLAGS_DEBUG=
+FLAGS_COLOR=
+FLAGS_VERBOSE=
 FLAGS_PARSE_EXT_COMPAT=1
+FLAGS_PRINT_STATIS=
+FLAGS_LITERAL_WEIGHT_DECAY=1
+FLAGS_LITERAL_WEIGHT_UPDATE=1
 
 # Common basic flags
 FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
@@ -35,7 +38,7 @@ FLAGS:=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
 ifneq ("$(FLAGS_DEBUG)","")
 	FLAGS := $(FLAGS) -DDEBUG -ggdb3 # Debug flags
 else
-	FLAGS := $(FLAGS) -O2 -O3 # Release flags
+	FLAGS := $(FLAGS) -O2 -O3 -Ofast -flto # Release flags
 endif
 ifneq ("$(FLAGS_COLOR)","")
 	FLAGS := $(FLAGS) -DDEBUG_COLOR
@@ -45,6 +48,15 @@ ifneq ("$(FLAGS_VERBOSE)","")
 endif
 ifneq ("$(FLAGS_PARSE_EXT_COMPAT)", "")
 	FLAGS := $(FLAGS) -DPARSE_EXT_COMPAT
+endif
+ifneq ("$(FLAGS_PRINT_STATIS)", "")
+	FLAGS := $(FLAGS) -DPRINT_STATIS
+endif
+ifneq ("$(FLAGS_LITERAL_WEIGHT_DECAY)", "")
+	FLAGS := $(FLAGS) -DLITERAL_WEIGHT_DECAY
+endif
+ifneq ("$(FLAGS_LITERAL_WEIGHT_UPDATE)", "")
+	FLAGS := $(FLAGS) -DLITERAL_WEIGHT_UPDATE
 endif
 
 # List all the .o files you need to build here

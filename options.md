@@ -30,6 +30,19 @@ to any non-blank value toggles is on, unless explicit notes.
     dramatically decrease the performance of the problem and transform it
     from CPU bounded application to IO bounded application. This is useful
     to find out the source of error during debugging. Disabled by default.
+-   `FLAGS_PRINT_STATIS`: toggle the print of statistic data. When enabled,
+    the program will print some statistic data of execution state every 3000
+    descstion. Currently, the program will print the number of decision,
+     the number of implication, the number of conflict, the number of current
+     learnt clause, and the maxium level of backtracking.
+-   `FLAGS_LITERAL_WEIGHT_DECAY`: toggle the literal weight decaying mode.
+    When enabled, the weight of literal will decay as the excution of the
+    solver. Current decaying strantegy is multiple $\frac{3}{4}$ every 200
+    decision.
+    This option is independent with the following weight update option.
+-   `FLAGS_LITERAL_WEIGHT_UPDATE`: toggle the literal weight update mode.
+    When enabled, the weight of literal will be updated when new clause
+    (the learnt conflict clause) is add into database.
 
 ## Execution Options
 

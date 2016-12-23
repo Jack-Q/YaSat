@@ -26,6 +26,7 @@ namespace fmt {
   inline ostream &positive(ostream &);
   inline ostream &negative(ostream &);
   inline ostream &reset(ostream &);
+  inline ostream &statisLabel(ostream &);
 
 
 #if defined(DEBUG_COLOR)
@@ -43,6 +44,7 @@ namespace fmt {
   ostream &positive(ostream &o) { return o << "\e[1;37m"; }
   ostream &negative(ostream &o) { return o << "\e[1;30m\e[47m"; }
   ostream &reset(ostream &o) { return o << "\e[0m"; }
+  ostream &statisLabel(ostream &o) { return o << "\e[1;32m" << "[STATIS]" << reset; }
 #else
   // plain output
   ostream &warning(ostream &o) { return o; }
@@ -54,6 +56,7 @@ namespace fmt {
   ostream &positive(ostream &o) { return o; }
   ostream &negative(ostream &o) { return o; }
   ostream &reset(ostream &o) { return o; }
+  ostream &statisLabel(ostream &o) { return o << "[STATIS]"; }
 #endif
 }
 }
