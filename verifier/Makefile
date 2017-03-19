@@ -7,13 +7,15 @@
 
 # Makefile for solver solution verifier
 
-CXX=g++
+ifeq ("$(CXX)","")
+	CXX := g++
+endif
 SHELL=/bin/bash
 
 EXENAME=yasat-veri
 
 FLAGS=  -Wall -Wold-style-cast -Wextra -Wformat=2 \
-         -std=c++11 -O3 -O2 -DDEBUG -DPARSE_EXT_COMPAT
+         -std=c++14 -O3 -O2 -DDEBUG -DPARSE_EXT_COMPAT
 
 $(EXENAME): main.cpp
 	$(CXX) $(FLAGS) -o $@ $<
