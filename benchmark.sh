@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# benchmark with plt of the result based on the Dumbbench Perl package
+# benchmark with plot of the result based on the Dumbbench Perl package
 #
 # Dependency: Dumbbench, Perl, ROOT,
 #
