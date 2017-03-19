@@ -83,13 +83,15 @@ $(DIROBJ)/%.o: $(DIRSRC)/%.cpp $(HEADERS) | dirs
 
 ##################### PHONY ####################
 tags:
-	@gtags
+# 	@gtags
 clean: verifier-clean
 	@rm -rf $(addprefix $(DIROBJ)/, $(OBJS))
 	@rm -rf $(DIRBIN)/$(EXENAME)
 	@rm -rf $(DIROBJ)
 	@rm -rf GPATH  GRTAGS  GSYMS  GTAGS
 	@rm -rf $(DIRTEST)
+	@rm -rf message.log
+	@rm -rf .gdb_history
 
 .PHONY: test test-m2 test-sanity test-tiny test-crafted test-m2-simple test-m2-hard
 test: test-sanity test-tiny test-m2-simple
@@ -172,14 +174,14 @@ test-m2-simple: all verifier | dir-test
 	@echo "TEST CASE 16: Parity 8bit"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par8-1.cnf $(DIRTEST)/par8-1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-simple/par8-1.cnf $(DIRTEST)/par8-1.sat
-	@echo "TEST CASE 17: Parity 16bit"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par16-1.cnf $(DIRTEST)/par16-1.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/par16-1.cnf $(DIRTEST)/par16-1.sat
-	@echo "TEST CASE 18: Parity 16bit (Simplified)"
-	$(DIRBIN)/$(EXENAME) benchmarks/m2-simple/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat > /dev/null
-	$(BINVERIFIER) -S benchmarks/m2-simple/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat
 test-m2-hard: all verifier | dir-test
 	@echo "###### M2-HARD TEST CASE ######"
+	@echo "TEST CASE 1: Parity 16bit"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/par16-1.cnf $(DIRTEST)/par16-1.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-hard/par16-1.cnf $(DIRTEST)/par16-1.sat
+	@echo "TEST CASE 2: Parity 16bit (Simplified)"
+	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat > /dev/null
+	$(BINVERIFIER) -S benchmarks/m2-hard/par16-1-c.cnf $(DIRTEST)/par16-1-c.sat
 	@echo "TEST CASE 3: Parity 32bit"
 	$(DIRBIN)/$(EXENAME) benchmarks/m2-hard/par32-1.cnf $(DIRTEST)/par32-1.sat > /dev/null
 	$(BINVERIFIER) -S benchmarks/m2-hard/par32-1.cnf $(DIRTEST)/par32-1.sat
