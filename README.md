@@ -1,5 +1,7 @@
 # YaSat -- Yet Another SAT solver
 
+[![Build Status](https://travis-ci.org/Jack-Q/YaSat.svg?branch=master)](https://travis-ci.org/Jack-Q/YaSat)
+
 > YaSat is yet another SAT solver.
 
 A SAT solver is a program that try to solve the satisfiability problem,
