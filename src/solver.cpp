@@ -1,3 +1,13 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * solver.cpp
+ * core process of Solver including DPLL, 1UIP,
+ *   2-LitWatching, etc.
+ **********************************************/
 #include "solver.h"
 
 namespace yasat {

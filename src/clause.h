@@ -1,3 +1,13 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * clause.h
+ * storage class representing a CNF clause in 
+ *   a SAT problem
+ **********************************************/
 #ifndef CLAUSE_HEADER
 #define CLAUSE_HEADER
 

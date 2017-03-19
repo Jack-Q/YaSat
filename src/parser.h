@@ -1,3 +1,13 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * parser.h
+ * Parser to read SAT problem from an ascii text 
+ *   file in DIMACS format
+ **********************************************/
 #ifndef PARSER_HEADER
 #define PARSER_HEADER
 

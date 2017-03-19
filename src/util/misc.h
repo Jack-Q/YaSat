@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * util/misc.h
+ * Miscellaneous definitions
+ **********************************************/
 #ifndef MISC_HEADER
 #define MISC_HEADER
 

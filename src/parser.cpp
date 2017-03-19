@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * parser.cpp
+ * implementation of the DIMACS parser
+ **********************************************/
 #include "parser.h"
 
 namespace yasat {

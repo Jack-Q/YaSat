@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * solver.h
+ * declaraiton of core state classes of YaSat
+ **********************************************/
 #ifndef SOLVER_HEADER
 #define SOLVER_HEADER
 #include "clause.h"

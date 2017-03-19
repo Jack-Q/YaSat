@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * yasat.cpp
+ * implementation of main class of YaSat 
+ **********************************************/
 #include <signal.h>
 
 #include "parser.h"

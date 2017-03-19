@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * writer.h
+ * helper class for message and state output 
+ **********************************************/
 #ifndef WRITER_HEADER
 #define WRITER_HEADER
 

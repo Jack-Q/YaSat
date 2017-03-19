@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * util/io.h
+ * IO related definitions
+ **********************************************/
 #ifndef IO_HEADER
 #define IO_HEADER
 

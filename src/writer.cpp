@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * writer.cpp
+ * implementation of Writer
+ **********************************************/
 #include "writer.h"
 
 namespace yasat {

@@ -1,3 +1,12 @@
+/**********************************************
+ *  YaSat -- Yet Another SAT Solver
+ *
+ *  Jack Q (qiaobo@outlook.com)
+ *  (0540017, CS, NCTU)
+ **********************************************
+ * util/exception.h
+ * C++ exception definition for parser
+ **********************************************/
 #ifndef EXCEPTION_HEADER
 #define EXCEPTION_HEADER
 
