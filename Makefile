@@ -10,7 +10,9 @@
 ################### Variables #################
 
 # General
-CXX=g++
+ifeq ("$(CXX)","")
+	CXX := g++
+endif
 DIRSRC=src
 DIRBIN=.
 DIROBJ=obj
